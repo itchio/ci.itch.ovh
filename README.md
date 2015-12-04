@@ -1,18 +1,16 @@
 # itch-ci-jobs
 
 This repo contains human-readable, diffable, YAML definitions
-for all jobs running at <http://ci.itch.ovh>
+for all jobs running at <https://lockfree.ch>
 
-We use [jenkins-job-builder](http://docs.openstack.org/infra/jenkins-job-builder)
+We use [cigale](https://github.com/itchio/cigale)
 to generate XML config that Jenkins can grok from these files.
 
-To get started, you need python + pip (one of its package managers). Then,
-install with:
+To install cigale, clone it, cd into it, then run:
 
 ```bash
-pip install jenkins-job-builder
+bundler install
+rake install
 ```
 
-Still learning how JJB works, ping me (@fasterthanlime) if the rest of
-instructions aren't there by the time you read this!
-
+You should be able to run `cigale` now.

@@ -1,0 +1,10 @@
+
+- :export:
+    inject:
+      properties-content: '{* string}'
+
+- :shell:
+    .on-unix: [ shell: '{* string}' ]
+
+- :batch:
+    .on-windows: [ batch: '{* string}' ]

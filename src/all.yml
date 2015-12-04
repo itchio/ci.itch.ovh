@@ -1,0 +1,10 @@
+
+- .go-job:
+    name: 'butler-multi-generated'
+    pkg: './cmd/butler'
+    exe: 'butler'
+    git:
+      host: github.com
+      user: itchio
+      name: butler
+      credentials: f5387502-f743-45da-b8d7-1a8bf7d2a54e

@@ -1,0 +1,48 @@
+
+- :go-build-steps: |
+    go get -d -v ./...
+    go build -v -x -ldflags "{ldflags}" {pkg}
+    file {exe}.exe
+    {exe}.exe -V
+
+- :go-job:
+    job:
+      name: '{name}'
+      project-type: matrix
+      workspace: '/{name}/$os-$arch/src/{git.host}/{git.user}/{git.name}'
+      child-workspace: .
+      scm:
+        - git:
+            url: 'git@{git.host}:{git.user}/{git.name}.git'
+          credentials-id: '{git.credentials}'
+          branches:
+            - '**'
+          refspec: 'refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*'
+      triggers:
+        - github
+      builders:
+        - .export: |
+            GOPATH=$WORKSPACE/../../../..
+            GOARCH=$arch
+            GO_JENKINS_LDFLAGS=-X main.version=travis-head
+            CGO_ENABLED=1
+            CC_FOR_TARGET=gcc
+            CXX_FOR_TARGET=g++
+        - .on-os-arch:
+            spec: windows-386
+            do: [ .export: 'Path=$Path;C:\msys64\mingw32\bin' ]
+        - .on-os-arch:
+            spec: windows-amd64
+            do: [ .export: 'Path=$Path;C:\msys64\mingw64\bin' ]
+        - .on-unix:
+            - .export: PATH=PATH:/usr/local/go/bin
+        - .shell:
+            .go-build-steps:
+              ldflags: '$GO_JENKINS_LDFLAGS'
+              pkg: '{pkg}'
+              exe: '{exe}'
+        - .batch:
+            .go-build-steps:
+              ldflags: '%GO_JENKINS_LDFLAGS%'
+              pkg: '{pkg}'
+              exe: '{exe}'

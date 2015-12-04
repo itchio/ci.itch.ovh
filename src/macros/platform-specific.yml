@@ -1,0 +1,17 @@
+
+- :on-os-arch:
+    conditional-step:
+      condition-kind: regex-match
+      label: $os-arch
+      regex: '{spec string}'
+      steps: '{do list}'
+
+- :on-windows:
+    .on-os-arch:
+      spec: windows-.*
+      do: '{* list}'
+
+- :on-unix:
+    .on-os-arch:
+      spec: (linux|osx)-.*
+      do: '{* list}'
