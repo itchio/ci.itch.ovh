@@ -2,7 +2,7 @@
 - :on-os-arch:
     conditional-step:
       condition-kind: regex-match
-      label: $os-arch
+      label: $os-$arch
       regex: '{spec string}'
       steps: '{do list}'
 

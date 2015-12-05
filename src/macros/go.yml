@@ -1,33 +1,57 @@
 
-- :go-build-steps: |
+- :go-build-binary: |
     go get -d -v ./...
     go build -v -x -ldflags "{ldflags}" {pkg}
-    file {exe}.exe
-    {exe}.exe -V
+    file {exe}
+    {exe} -V
 
 - :go-job:
     job:
       name: '{name}'
       project-type: matrix
-      workspace: '/{name}/$os-$arch/src/{git.host}/{git.user}/{git.name}'
+      execution-strategy:
+        combination-filter: (os == "osx").implies(arch == "amd64")
+      axes:
+        - axis:
+            type: label-expression
+            name: os
+            values:
+              - windows
+              - osx
+              - linux
+        - axis:
+            type: user-defined
+            name: arch
+            values:
+              - 386
+              - amd64
+      workspace: 'workspace/{name}/$os-$arch/src/{git.host}/{git.user}/{git.name}'
       child-workspace: .
       scm:
         - git:
             url: 'git@{git.host}:{git.user}/{git.name}.git'
-          credentials-id: '{git.credentials}'
-          branches:
-            - '**'
-          refspec: 'refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*'
+            credentials-id: '{git.credentials}'
+            branches:
+              - '**'
+            refspec: 'refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*'
       triggers:
         - github
+      wrappers:
+        - inject:
+            groovy-script-content: |
+              if (!binding.variables.containsKey('GIT_TAG_NAME')) {
+                return [GIT_TAG_NAME: "head"]
+              }
       builders:
         - .export: |
             GOPATH=$WORKSPACE/../../../..
             GOARCH=$arch
-            GO_JENKINS_LDFLAGS=-X main.version=travis-head
+            GO_JENKINS_LDFLAGS=-X main.version=$GIT_TAG_NAME
             CGO_ENABLED=1
             CC_FOR_TARGET=gcc
             CXX_FOR_TARGET=g++
+        - .on-windows:
+            - .export: Path=$Path;C:\msys64\usr\bin
         - .on-os-arch:
             spec: windows-386
             do: [ .export: 'Path=$Path;C:\msys64\mingw32\bin' ]
@@ -35,14 +59,14 @@
             spec: windows-amd64
             do: [ .export: 'Path=$Path;C:\msys64\mingw64\bin' ]
         - .on-unix:
-            - .export: PATH=PATH:/usr/local/go/bin
+            - .export: PATH=$PATH:/usr/local/go/bin
         - .shell:
-            .go-build-steps:
+            .go-build-binary:
               ldflags: '$GO_JENKINS_LDFLAGS'
               pkg: '{pkg}'
-              exe: '{exe}'
+              exe: './{exe}'
         - .batch:
-            .go-build-steps:
+            .go-build-binary:
               ldflags: '%GO_JENKINS_LDFLAGS%'
               pkg: '{pkg}'
-              exe: '{exe}'
+              exe: '{exe}.exe'
