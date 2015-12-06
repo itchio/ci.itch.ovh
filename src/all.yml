@@ -1,10 +1,29 @@
 
 - .go-job:
-    name: 'butler-multi-generated'
+    name: butler-multi-generated
     pkg: './cmd/butler'
     exe: 'butler'
-    git:
+    git: &butler-git
       host: github.com
       user: itchio
       name: butler
       credentials: f5387502-f743-45da-b8d7-1a8bf7d2a54e
+      branches: '$TAG'
+
+- job:
+    name: butler-multi-generated-trigger
+    node: groovy
+    scm:
+      .git:
+        <<: *butler-git
+        branches: '**'
+        wipe: false
+    builders:
+      - groovy:
+          command:
+            .export-latest-tag:
+    publishers:
+      - trigger-parameterized-builds:
+        - project: butler-multi-generated
+          property-file: release.properties
+          condition: success

@@ -1,4 +1,30 @@
 
+- :on-os-arch:
+    conditional-step:
+      condition-kind: regex-match
+      label: $os-$arch
+      regex: '{spec string}'
+      steps: '{do list}'
+
+- :on-release:
+    conditional-publisher:
+      - condition-kind: not
+        condition-operand:
+          condition-kind: regex-match
+          label: $TAG
+          regex: 'master'
+        action: '{*}'
+
+- :on-windows:
+    .on-os-arch:
+      spec: windows-.*
+      do: '{* list}'
+
+- :on-unix:
+    .on-os-arch:
+      spec: (linux|osx)-.*
+      do: '{* list}'
+
 - :export:
     inject:
       properties-content: '{* string}'
@@ -8,3 +34,11 @@
 
 - :batch:
     .on-windows: [ batch: '{* string}' ]
+
+- :git:
+    git:
+      url: 'git@{host}:{user}/{name}.git'
+      credentials-id: '{credentials}'
+      branches:
+        - '{branches}'
+      refspec: '+refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/remotes/origin/tags/*'

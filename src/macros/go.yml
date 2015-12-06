@@ -4,6 +4,8 @@
     go build -v -x -ldflags "{ldflags}" {pkg}
     file {exe}
     {exe} -V
+    7za a {name}.7z {exe}
+    echo "$TAG" > LATEST
 
 - :go-job:
     job:
@@ -11,6 +13,10 @@
       project-type: matrix
       execution-strategy:
         combination-filter: (os == "osx").implies(arch == "amd64")
+      parameters:
+        - string:
+            name: TAG
+            default: '**'
       axes:
         - axis:
             type: label-expression
@@ -28,30 +34,20 @@
       workspace: 'workspace/{name}/$os-$arch/src/{git.host}/{git.user}/{git.name}'
       child-workspace: .
       scm:
-        - git:
-            url: 'git@{git.host}:{git.user}/{git.name}.git'
-            credentials-id: '{git.credentials}'
-            branches:
-              - '**'
-            refspec: 'refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*'
+        - .git: '{git}'
       triggers:
         - github
-      wrappers:
-        - inject:
-            groovy-script-content: |
-              if (!binding.variables.containsKey('GIT_TAG_NAME')) {
-                return [GIT_TAG_NAME: "head"]
-              }
+        - pollscm
       builders:
         - .export: |
             GOPATH=$WORKSPACE/../../../..
             GOARCH=$arch
-            GO_JENKINS_LDFLAGS=-X main.version=$GIT_TAG_NAME
+            GO_JENKINS_LDFLAGS=-X main.version=$TAG
             CGO_ENABLED=1
             CC_FOR_TARGET=gcc
             CXX_FOR_TARGET=g++
         - .on-windows:
-            - .export: Path=$Path;C:\msys64\usr\bin
+            - .export: Path=$Path;C:\msys64\usr\bin;C:\msys64\usr\lib\p7zip
         - .on-os-arch:
             spec: windows-386
             do: [ .export: 'Path=$Path;C:\msys64\mingw32\bin' ]
@@ -63,10 +59,21 @@
         - .shell:
             .go-build-binary:
               ldflags: '$GO_JENKINS_LDFLAGS'
+              name: '{exe}'
               pkg: '{pkg}'
               exe: './{exe}'
         - .batch:
             .go-build-binary:
               ldflags: '%GO_JENKINS_LDFLAGS%'
+              name: '{exe}'
               pkg: '{pkg}'
               exe: '{exe}.exe'
+      publishers:
+        - .on-release:
+            - s3:
+                s3-profile: misc.amos.me
+                entries:
+                  - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch/$TAG'
+                    source-files: '{exe}.7z'
+                  - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch'
+                    source-files: 'LATEST'
