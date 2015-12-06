@@ -14,3 +14,41 @@ rake install
 ```
 
 You should be able to run `cigale` now.
+
+## Testing config files
+
+To test your changes, run:
+
+```bash
+cigale test src -o tmp
+```
+
+It'll output a bunch of `.xml` files in `tmp/` that you can compare with
+Jenkins-generated files (e.g. `/var/lib/jenkins/jobs/foobar/config.xml`)
+
+If you're suspecting macros and the XML output isn't clear enough,
+use the `dump` command to dump YAML after all macros have been expanded
+
+```bash
+cigale dump src -o tmp
+```
+
+## Updating Jenkins config
+
+First off, copy `secret/cigale.sample.yml` to `secret/cigale.yml` and
+edit in your actual credentials.
+
+**Don't actually put your password**, use your Jenkins API key, which
+you can find at <https://lockfree.ch/user/YOUR_JENKINS_USERNAME/configure>
+
+Then run:
+
+```bash
+cigale update src
+```
+
+That command creates or updates all jobs defined in `src/**/*.yml`
+
+If you've renamed some jobs, rename them from the Jenkins UI before running
+`cigale update`.
+
