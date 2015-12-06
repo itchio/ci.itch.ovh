@@ -11,7 +11,7 @@
       - condition-kind: not
         condition-operand:
           condition-kind: regex-match
-          label: $TAG
+          label: $JENKINS_TAG
           regex: 'master'
         action: '{*}'
 
@@ -43,3 +43,17 @@
         - '{branches}'
       refspec: '+refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/remotes/origin/tags/*'
       wipe: '{wipe}'
+
+- :windows-os:
+    os:
+      var-l: '%'
+      var-r: '%'
+      exe-l: ''
+      exe-r: '.exe'
+
+- :linux-os:
+    os:
+      var-l: '$'
+      var-r: ''
+      exe-l: './'
+      exe-r: ''

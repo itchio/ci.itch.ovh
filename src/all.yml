@@ -8,7 +8,7 @@
       user: itchio
       name: butler
       credentials: f5387502-f743-45da-b8d7-1a8bf7d2a54e
-      branches: '$TAG'
+      branches: '$JENKINS_TAG'
       wipe: true
 
 - job:

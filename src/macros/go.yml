@@ -1,11 +1,23 @@
 
+- :windows-os: &windows-os
+    var-l: '%'
+    var-r: '%'
+    exe-l: ''
+    exe-r: '.exe'
+
+- :linux-os: &linux-os
+    var-l: '$'
+    var-r: ''
+    exe-l: './'
+    exe-r: ''
+
 - :go-build-binary: |
     go get -d -v ./...
-    go build -v -x -ldflags "{ldflags}" {pkg}
-    file {exe}
-    {exe} -V
-    7za a {name}.7z {exe}
-    echo "$TAG" > LATEST
+    go build -v -ldflags "{os.var-l}JENKINS_LDFLAGS{os.var-r}" {pkg}
+    file {exe}{os.exe-r}
+    {os.exe-l}{exe} -V
+    7za a {exe}.7z {exe}{os.exe-r}
+    echo {os.var-l}JENKINS_TAG{os.var-r} > LATEST
 
 - :go-job:
     job:
@@ -15,7 +27,7 @@
         combination-filter: (os == "osx").implies(arch == "amd64")
       parameters:
         - string:
-            name: TAG
+            name: JENKINS_TAG
             default: '**'
       axes:
         - axis:
@@ -42,7 +54,7 @@
         - .export: |
             GOPATH=$WORKSPACE/../../../..
             GOARCH=$arch
-            GO_JENKINS_LDFLAGS=-X main.version=$TAG
+            JENKINS_LDFLAGS=-X main.version=$TAG
             CGO_ENABLED=1
             CC_FOR_TARGET=gcc
             CXX_FOR_TARGET=g++
@@ -58,16 +70,14 @@
             - .export: PATH=$PATH:/usr/local/go/bin
         - .shell:
             .go-build-binary:
-              ldflags: '$GO_JENKINS_LDFLAGS'
-              name: '{exe}'
+              os: *linux-os
               pkg: '{pkg}'
-              exe: './{exe}'
+              exe: '{exe}'
         - .batch:
             .go-build-binary:
-              ldflags: '%GO_JENKINS_LDFLAGS%'
-              name: '{exe}'
+              os: *windows-os
               pkg: '{pkg}'
-              exe: '{exe}.exe'
+              exe: '{exe}'
       publishers:
         - .on-release:
             - s3:
