@@ -23,6 +23,7 @@
     job:
       name: '{name}'
       project-type: matrix
+      node: 'gcs'
       execution-strategy:
         combination-filter: (os == "osx").implies(arch == "amd64")
       parameters:
