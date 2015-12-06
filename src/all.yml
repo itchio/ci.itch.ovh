@@ -9,6 +9,7 @@
       name: butler
       credentials: f5387502-f743-45da-b8d7-1a8bf7d2a54e
       branches: '$TAG'
+      wipe: true
 
 - job:
     name: butler-multi-generated-trigger
