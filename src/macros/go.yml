@@ -28,7 +28,7 @@
       parameters:
         - string:
             name: JENKINS_TAG
-            default: '**'
+            default: 'master'
       axes:
         - axis:
             type: label-expression
@@ -54,7 +54,7 @@
         - .export: |
             GOPATH=$WORKSPACE/../../../..
             GOARCH=$arch
-            JENKINS_LDFLAGS=-X main.version=$TAG
+            JENKINS_LDFLAGS=-X main.version=$JENKINS_TAG
             CGO_ENABLED=1
             CC_FOR_TARGET=gcc
             CXX_FOR_TARGET=g++
@@ -83,7 +83,7 @@
             - s3:
                 s3-profile: misc.amos.me
                 entries:
-                  - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch/$TAG'
+                  - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch/$JENKINS_TAG'
                     source-files: '{exe}.7z'
                   - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch'
                     source-files: 'LATEST'
