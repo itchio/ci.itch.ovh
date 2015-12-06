@@ -1,6 +1,6 @@
 
 - .go-job:
-    name: butler-multi-generated
+    name: butler
     pkg: './cmd/butler'
     exe: 'butler'
     git: &butler-git
@@ -12,7 +12,7 @@
       wipe: true
 
 - job:
-    name: butler-multi-generated-trigger
+    name: butler-releases
     node: groovy
     scm:
       .git:
@@ -25,6 +25,6 @@
             .export-latest-tag:
     publishers:
       - trigger-parameterized-builds:
-        - project: butler-multi-generated
+        - project: butler
           property-file: release.properties
           condition: success
