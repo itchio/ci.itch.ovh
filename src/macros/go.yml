@@ -60,14 +60,5 @@
               7za a {exe}.7z $TARGET
               echo $JENKINS_VERSION > LATEST
       publishers:
-          - google-cloud-storage:
-              credentials-id: butler-server-1131
-              uploads:
-                - classic:
-                    storage-location: 'gs://dl.itch.ovh/{exe}/$JENKINS_OS-$JENKINS_ARCH/$JENKINS_VERSION'
-                    file-pattern: '{exe}.7z'
-                    share-publicly: true
-                - classic:
-                    storage-location: 'gs://dl.itch.ovh/{exe}/$JENKINS_OS-$JENKINS_ARCH'
-                    file-pattern: 'LATEST'
-                    share-publicly: true
+        - .deploy-to-gcs:
+            package: '{exe}'

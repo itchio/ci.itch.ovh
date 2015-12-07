@@ -46,6 +46,9 @@
           make
           file elevate.exe
           7za a elevate.7z elevate.exe
+    publishers:
+      - .deploy-to-gcs:
+          package: 'elevate'
 
 - job:
     name: elevate-trigger
