@@ -19,7 +19,7 @@
 
 - :on-unix:
     .on-os-arch:
-      spec: (linux|osx)-.*
+      spec: (linux|darwin)-.*
       do: '{* list}'
 
 - :export:

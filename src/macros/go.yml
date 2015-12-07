@@ -5,7 +5,7 @@
       project-type: matrix
       node: 'gcs'
       execution-strategy:
-        combination-filter: (JENKINS_OS == "osx").implies(JENKINS_ARCH == "amd64")
+        combination-filter: (JENKINS_OS == "darwin").implies(JENKINS_ARCH == "amd64")
       parameters:
         - string:
             name: JENKINS_TAG
@@ -15,7 +15,7 @@
             name: JENKINS_OS
             values:
               - windows
-              - osx
+              - darwin
               - linux
         - axis:
             type: user-defined
@@ -60,12 +60,14 @@
               7za a {exe}.7z $TARGET
               echo $JENKINS_VERSION > LATEST
       publishers:
-        - conditional-publisher:
-            .on-deploy:
-              - s3:
-                  s3-profile: misc.amos.me
-                  entries:
-                    - destination-bucket: 'misc.amos.me/{exe}-jenkins/$JENKINS_OS-$JENKINS_ARCH/$JENKINS_VERSION'
-                      source-files: '{exe}.7z'
-                    - destination-bucket: 'misc.amos.me/{exe}-jenkins/$JENKINS_OS-$JENKINS_ARCH'
-                      source-files: 'LATEST'
+          - google-cloud-storage:
+              credentials-id: butler-server-1131
+              uploads:
+                - classic:
+                    storage-location: 'gs://dl.itch.ovh/{exe}/$JENKINS_OS-$JENKINS_ARCH/$JENKINS_VERSION'
+                    file-pattern: '{exe}.7z'
+                    share-publicly: true
+                - classic:
+                    storage-location: 'gs://dl.itch.ovh/{exe}/$JENKINS_OS-$JENKINS_ARCH'
+                    file-pattern: 'LATEST'
+                    share-publicly: true
