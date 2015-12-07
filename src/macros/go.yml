@@ -12,12 +12,12 @@
     exe-r: ''
 
 - :go-build-binary: |
-    go get -d -v ./...
+    go get -v ./...
     go build -v -ldflags "{os.var-l}JENKINS_LDFLAGS{os.var-r}" {pkg}
     file {exe}{os.exe-r}
     {os.exe-l}{exe} -V
     7za a {exe}.7z {exe}{os.exe-r}
-    echo {os.var-l}JENKINS_TAG{os.var-r} > LATEST
+    echo {os.var-l}JENKINS_VERSION{os.var-r} > LATEST
 
 - :go-job:
     job:
@@ -29,7 +29,6 @@
       parameters:
         - string:
             name: JENKINS_TAG
-            default: '**'
       axes:
         - axis:
             type: label-expression
@@ -48,19 +47,26 @@
       child-workspace: .
       scm:
         - .git: '{git}'
-      triggers:
-        - pollscm
-      builders:
+      wrappers:
         - inject:
-            script-content: |
+            groovy-script-content: |
               if (JENKINS_TAG == '**') {
-                return [JENKINS_TAG: GIT_BRANCH]
+                return [
+                  JENKINS_VERSION: "head",
+                  JENKINS_DEPLOY: "0",
+                  JENKINS_LDFLAGS: "-X main.version=head",
+                ]
+              } else {
+                return [
+                  JENKINS_VERSION: JENKINS_TAG,
+                  JENKINS_DEPLOY: "0",
+                  JENKINS_LDFLAGS: "-X main.version=$JENKINS_TAG",
+                ]
               }
-              return []
+      builders:
         - .export: |
             GOPATH=$WORKSPACE/../../../..
             GOARCH=$arch
-            JENKINS_LDFLAGS=-X main.version=$JENKINS_TAG
             CGO_ENABLED=1
             CC_FOR_TARGET=gcc
             CXX_FOR_TARGET=g++
@@ -85,11 +91,11 @@
               pkg: '{pkg}'
               exe: '{exe}'
       publishers:
-        - .on-release:
+        - .on-deploy:
             - s3:
                 s3-profile: misc.amos.me
                 entries:
-                  - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch/$JENKINS_TAG'
+                  - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch/${ENV,var="JENKINS_VERSION"}'
                     source-files: '{exe}.7z'
                   - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch'
                     source-files: 'LATEST'

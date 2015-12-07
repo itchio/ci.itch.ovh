@@ -1,5 +1,6 @@
 
 - .go-job:
+    # always triggered by `butler-releases`
     name: butler
     pkg: './cmd/butler'
     exe: 'butler'
@@ -12,6 +13,10 @@
       wipe: true
 
 - job:
+    # triggered by POST to /job/butler-releases/build?token=XXX
+    # checks if there's a recent tag we haven't built, in which case,
+    # asks `butler` to build that. If there isn't, asks `butler` to build
+    # whatever ('**') which means any commit pushed to any branch
     name: butler-releases
     node: groovy
     scm:
@@ -19,8 +24,7 @@
         <<: *butler-git
         branches: '**'
         wipe: false
-    triggers:
-      - pollscm
+    token: 'JOLLY_FARM'
     builders:
       - groovy:
           command:
@@ -28,5 +32,5 @@
     publishers:
       - trigger-parameterized-builds:
         - project: butler
-          property-file: release.properties
+          property-file: revision.properties
           condition: success

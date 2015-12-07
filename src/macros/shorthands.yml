@@ -6,13 +6,11 @@
       regex: '{spec string}'
       steps: '{do list}'
 
-- :on-release:
+- :on-deploy:
     conditional-publisher:
-      - condition-kind: not
-        condition-operand:
-          condition-kind: regex-match
-          label: $JENKINS_TAG
-          regex: 'master'
+      - condition-kind: regex-match
+        label: '$JENKINS_TAG'
+        regex: '^v.*$'
         action: '{*}'
 
 - :on-windows:

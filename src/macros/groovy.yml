@@ -12,9 +12,16 @@
 
     props = "JENKINS_TAG = v$latest"
 
-    store = new File('release.properties')
-    if (store.exists() && store.text == props) {
-      throw new RuntimeException("Latest tag already built")
+    latest_tag = new File('latest_tag.properties')
+    revision = new File('revision.properties')
+
+    if (latest_tag.exists() && latest_tag.text == props) {
+      // just build whatever was pushed
+      revision.text = "JENKINS_TAG = **"
+    } else {
+      // ah, cool, a new tag!
+      revision.text = props
     }
 
-    store.text = props
+    // make sure not to wipe workspace.
+    latest_tag.text = props
