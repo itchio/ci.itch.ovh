@@ -19,6 +19,8 @@
         <<: *butler-git
         branches: '**'
         wipe: false
+    triggers:
+      - pollscm
     builders:
       - groovy:
           command:

@@ -29,7 +29,7 @@
       parameters:
         - string:
             name: JENKINS_TAG
-            default: 'master'
+            default: '**'
       axes:
         - axis:
             type: label-expression
@@ -49,9 +49,14 @@
       scm:
         - .git: '{git}'
       triggers:
-        - github
         - pollscm
       builders:
+        - inject:
+            script-content: |
+              if (JENKINS_TAG == '**') {
+                return [JENKINS_TAG: GIT_BRANCH]
+              }
+              return []
         - .export: |
             GOPATH=$WORKSPACE/../../../..
             GOARCH=$arch
