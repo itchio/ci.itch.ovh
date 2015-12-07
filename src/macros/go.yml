@@ -28,6 +28,7 @@
       scm:
         - .git: '{git}'
       wrappers:
+        - ansi-color
         - inject:
             groovy-script-content:
               .export-jenkins-version:

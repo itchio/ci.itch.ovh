@@ -24,6 +24,8 @@
         branches: '**'
         wipe: false
     token: 'JOLLY_FARM'
+    wrappers:
+      - ansi-color
     builders:
       - groovy:
           command:

@@ -28,10 +28,11 @@
         branches: '$JENKINS_TAG'
         wipe: true
     wrappers:
+      - ansi-color
       - inject:
           groovy-script-content:
             .export-jenkins-version:
-    workspace: 'workspace/elevate-$JENKINS_ARCH'
+    workspace: 'workspace/elevate/$JENKINS_OS-$JENKINS_ARCH'
     builders:
       - shell: |
           cppcheck --error-exitcode=1 src
@@ -60,6 +61,8 @@
         branches: '**'
         wipe: false
     token: 'JILLIAN_BROWN'
+    wrappers:
+      - ansi-color
     builders:
       - groovy:
           command:

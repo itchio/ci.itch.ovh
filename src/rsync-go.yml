@@ -11,6 +11,8 @@
         name: rsync-go
         branches: '**'
         wipe: true
+    wrappers:
+      - ansi-color
     builders:
       - shell: |
           export GOPATH="$WORKSPACE/../../../.."

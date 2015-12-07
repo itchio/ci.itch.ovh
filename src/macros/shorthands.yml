@@ -34,16 +34,20 @@
         - '{branches}'
       wipe: '{wipe}'
 
-
 - :deploy-to-gcs:
-    google-cloud-storage:
-      credentials-id: butler-server-1131
-      uploads:
-        - classic:
-            storage-location: 'gs://dl.itch.ovh/{package}/$JENKINS_OS-$JENKINS_ARCH/$JENKINS_VERSION'
-            file-pattern: '{package}.7z'
-            share-publicly: true
-        - classic:
-            storage-location: 'gs://dl.itch.ovh/{package}/$JENKINS_OS-$JENKINS_ARCH'
-            file-pattern: 'LATEST'
-            share-publicly: true
+    conditional-publisher:
+      - condition-kind: regex-match
+        label: $JENKINS_DEPLOY
+        regex: 1
+        action:
+          - google-cloud-storage:
+              credentials-id: butler-server-1131
+              uploads:
+                - classic:
+                    storage-location: 'gs://dl.itch.ovh/{package}/$JENKINS_OS-$JENKINS_ARCH/$JENKINS_VERSION'
+                    file-pattern: '{package}.7z'
+                    share-publicly: true
+                - classic:
+                    storage-location: 'gs://dl.itch.ovh/{package}/$JENKINS_OS-$JENKINS_ARCH'
+                    file-pattern: 'LATEST'
+                    share-publicly: true
