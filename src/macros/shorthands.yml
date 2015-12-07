@@ -7,11 +7,10 @@
       steps: '{do list}'
 
 - :on-deploy:
-    conditional-publisher:
-      - condition-kind: regex-match
-        label: '$JENKINS_TAG'
-        regex: '^v.*$'
-        action: '{*}'
+    - condition-kind: regex-match
+      label: '$JENKINS_TAG'
+      regex: '^v.*$'
+      action: '{*}'
 
 - :on-windows:
     .on-os-arch:
@@ -27,12 +26,6 @@
     inject:
       properties-content: '{* string}'
 
-- :shell:
-    .on-unix: [ shell: '{* string}' ]
-
-- :batch:
-    .on-windows: [ batch: '{* string}' ]
-
 - :git:
     git:
       url: 'git@{host}:{user}/{name}.git'
@@ -41,17 +34,3 @@
         - '{branches}'
       refspec: '+refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/remotes/origin/tags/*'
       wipe: '{wipe}'
-
-- :windows-os:
-    os:
-      var-l: '%'
-      var-r: '%'
-      exe-l: ''
-      exe-r: '.exe'
-
-- :linux-os:
-    os:
-      var-l: '$'
-      var-r: ''
-      exe-l: './'
-      exe-r: ''

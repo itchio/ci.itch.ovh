@@ -1,73 +1,71 @@
 
-- :windows-os: &windows-os
-    var-l: '%'
-    var-r: '%'
-    exe-l: ''
-    exe-r: '.exe'
-
-- :linux-os: &linux-os
-    var-l: '$'
-    var-r: ''
-    exe-l: './'
-    exe-r: ''
-
-- :go-build-binary: |
-    go get -v ./...
-    go build -v -ldflags "{os.var-l}JENKINS_LDFLAGS{os.var-r}" {pkg}
-    file {exe}{os.exe-r}
-    {os.exe-l}{exe} -V
-    7za a {exe}.7z {exe}{os.exe-r}
-    echo {os.var-l}JENKINS_VERSION{os.var-r} > LATEST
-
 - :go-job:
     job:
       name: '{name}'
       project-type: matrix
       node: 'gcs'
       execution-strategy:
-        combination-filter: (os == "osx").implies(arch == "amd64")
+        combination-filter: (JENKINS_OS == "osx").implies(JENKINS_ARCH == "amd64")
       parameters:
         - string:
             name: JENKINS_TAG
       axes:
         - axis:
             type: label-expression
-            name: os
+            name: JENKINS_OS
             values:
               - windows
               - osx
               - linux
         - axis:
             type: user-defined
-            name: arch
+            name: JENKINS_ARCH
             values:
               - 386
               - amd64
-      workspace: 'workspace/{name}/$os-$arch/src/{git.host}/{git.user}/{git.name}'
+      workspace: 'workspace/{name}/$JENKINS_OS-$JENKINS_ARCH/src/{git.host}/{git.user}/{git.name}'
       child-workspace: .
       scm:
         - .git: '{git}'
       wrappers:
         - inject:
             groovy-script-content:
-              .export-go-env:
+              .export-jenkins-version:
       builders:
-        - .shell:
-            .go-build-binary:
-              os: *linux-os
-              pkg: '{pkg}'
-              exe: '{exe}'
-        - .batch:
-            .go-build-binary:
-              os: *windows-os
-              pkg: '{pkg}'
-              exe: '{exe}'
+        - shell: |
+              export GOPATH="$WORKSPACE/../../../.."
+              export GOARCH="$JENKINS_ARCH"
+              export CGO_ENABLED=1
+              export CC_FOR_TARGET="gcc"
+              export CXX_FOR_TARGET="g++"
+              export JENKINS_LDFLAGS="-X main.version=$JENKINS_VERSION"
+
+              TARGET={exe}
+              if [[ "$JENKINS_OS" == "windows" ]]; then
+                TARGET=$TARGET.exe
+                if [[ "$JENKINS_ARCH" == "amd64" ]]; then
+                  export PATH=/mingw64/bin:$PATH
+                else
+                  export PATH=/mingw32/bin:$PATH
+                fi
+              else
+                export PATH=$PATH:/usr/local/go/bin
+              fi
+
+              go get -v -d ./...
+              go build -v -ldflags "$JENKINS_LDFLAGS" {pkg}
+
+              file $TARGET
+              ./$TARGET -V
+              7za a {exe}.7z $TARGET
+              echo $JENKINS_VERSION > LATEST
       publishers:
-        - .on-deploy:
-            - s3:
-                s3-profile: misc.amos.me
-                entries:
-                  - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch/${ENV,var="JENKINS_VERSION"}'
-                    source-files: '{exe}.7z'
-                  - destination-bucket: 'misc.amos.me/{exe}-jenkins/$os-$arch'
-                    source-files: 'LATEST'
+        - conditional-publisher:
+            .on-deploy:
+              - s3:
+                  s3-profile: misc.amos.me
+                  entries:
+                    - destination-bucket: 'misc.amos.me/{exe}-jenkins/$JENKINS_OS-$JENKINS_ARCH/$JENKINS_VERSION'
+                      source-files: '{exe}.7z'
+                    - destination-bucket: 'misc.amos.me/{exe}-jenkins/$JENKINS_OS-$JENKINS_ARCH'
+                      source-files: 'LATEST'
