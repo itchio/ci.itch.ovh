@@ -1,0 +1,18 @@
+
+- job:
+    name: rsync-go
+    triggers:
+      - github
+    workspace: 'workspace/rsync-go/universal/src/github.com/itchio/rsync-go'
+    scm:
+      .git:
+        host: github.com
+        user: itchio
+        name: rsync-go
+        branches: '**'
+        wipe: true
+    builders:
+      - shell: |
+          export GOPATH="$WORKSPACE/../../../.."
+          go get -d -v ./...
+          go test -v

@@ -1,0 +1,20 @@
+
+- job:
+    name: wharf
+    triggers:
+      - github
+    workspace: 'workspace/wharf/universal/src/bitbucket.org/itchio/wharf'
+    scm:
+      .git:
+        host: bitbucket.org
+        user: itchio
+        name: wharf
+        branches: '**'
+        wipe: true
+    builders:
+      - shell: |
+          export GOPATH="$WORKSPACE/../../../.."
+          go get -d -v ./...
+          go build -v
+          file wharf
+          7za a wharf.7z wharf
