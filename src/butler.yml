@@ -17,7 +17,7 @@
     # checks if there's a recent tag we haven't built, in which case,
     # asks `butler` to build that. If there isn't, asks `butler` to build
     # whatever ('**') which means any commit pushed to any branch
-    name: butler-releases
+    name: butler-trigger
     node: groovy
     scm:
       .git:

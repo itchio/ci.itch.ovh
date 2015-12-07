@@ -49,37 +49,9 @@
         - .git: '{git}'
       wrappers:
         - inject:
-            groovy-script-content: |
-              if (JENKINS_TAG == '**') {
-                return [
-                  JENKINS_VERSION: "head",
-                  JENKINS_DEPLOY: "0",
-                  JENKINS_LDFLAGS: "-X main.version=head",
-                ]
-              } else {
-                return [
-                  JENKINS_VERSION: JENKINS_TAG,
-                  JENKINS_DEPLOY: "0",
-                  JENKINS_LDFLAGS: "-X main.version=$JENKINS_TAG",
-                ]
-              }
+            groovy-script-content:
+              .export-go-env:
       builders:
-        - .export: |
-            GOPATH=$WORKSPACE/../../../..
-            GOARCH=$arch
-            CGO_ENABLED=1
-            CC_FOR_TARGET=gcc
-            CXX_FOR_TARGET=g++
-        - .on-windows:
-            - .export: Path=$Path;C:\msys64\usr\bin;C:\msys64\usr\lib\p7zip
-        - .on-os-arch:
-            spec: windows-386
-            do: [ .export: 'Path=$Path;C:\msys64\mingw32\bin' ]
-        - .on-os-arch:
-            spec: windows-amd64
-            do: [ .export: 'Path=$Path;C:\msys64\mingw64\bin' ]
-        - .on-unix:
-            - .export: PATH=$PATH:/usr/local/go/bin
         - .shell:
             .go-build-binary:
               os: *linux-os
