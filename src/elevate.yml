@@ -46,6 +46,7 @@
           make
           file elevate.exe
           7za a elevate.7z elevate.exe
+          echo $JENKINS_VERSION > LATEST
     publishers:
       - .deploy-to-gcs:
           package: 'elevate'
