@@ -1,0 +1,67 @@
+
+- job:
+    name: elevate
+    project-type: matrix
+    node: 'gcs'
+    parameters:
+      - string:
+          name: JENKINS_TAG
+    axes:
+      - axis:
+          type: label-expression
+          name: JENKINS_OS
+          values:
+            - windows
+      - axis:
+          type: user-defined
+          name: JENKINS_ARCH
+          values:
+            - 386
+            - amd64
+    triggers:
+      - github
+    scm:
+      .git: &elevate-git
+        host: github.com
+        user: itchio
+        name: elevate
+        branches: '$JENKINS_TAG'
+        wipe: true
+    wrappers:
+      - inject:
+          groovy-script-content:
+            .export-jenkins-version:
+    workspace: 'workspace/elevate-$JENKINS_ARCH'
+    builders:
+      - shell: |
+          cppcheck --error-exitcode=1 src
+      - shell: |
+          export ELEVATE_CFLAGS="-DELEVATE_VERSION=\\\"$JENKINS_VERSION\\\""
+
+          if [[ "$JENKINS_ARCH" == "amd64" ]]; then
+            export PATH=/mingw64/bin:$PATH
+          else
+            export PATH=/mingw32/bin:$PATH
+          fi
+          make
+          file elevate.exe
+          7za a elevate.7z elevate.exe
+
+- job:
+    name: elevate-trigger
+    node: groovy
+    scm:
+      .git:
+        <<: *elevate-git
+        branches: '**'
+        wipe: false
+    token: 'JILLIAN_BROWN'
+    builders:
+      - groovy:
+          command:
+            .export-latest-tag:
+    publishers:
+      - trigger-parameterized-builds:
+        - project: elevate
+          property-file: revision.properties
+          condition: success

@@ -32,5 +32,4 @@
       credentials-id: 'f5387502-f743-45da-b8d7-1a8bf7d2a54e'
       branches:
         - '{branches}'
-      refspec: '+refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/remotes/origin/tags/*'
       wipe: '{wipe}'
