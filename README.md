@@ -1,3 +1,6 @@
+
+![needs more badges](https://img.shields.io/badge/CI%20/%20CD-pretty%20cool-FFC107.svg)
+
 # ci.itch.ovh
 
 This repo contains human-readable, diffable, YAML definitions
