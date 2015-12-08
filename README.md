@@ -1,16 +1,15 @@
-# itch-ci-jobs
+# ci.itch.ovh
 
 This repo contains human-readable, diffable, YAML definitions
-for all jobs running at <https://lockfree.ch>
+for all jobs running at <https://ci.itch.ovh>
 
 We use [cigale](https://github.com/itchio/cigale)
 to generate XML config that Jenkins can grok from these files.
 
-To install cigale, clone it, cd into it, then run:
+To install cigale, make sure you have ruby & rubygems installed, and run:
 
 ```bash
-bundler install
-rake install
+gem install cigale
 ```
 
 You should be able to run `cigale` now.
