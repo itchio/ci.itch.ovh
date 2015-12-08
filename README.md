@@ -40,7 +40,7 @@ First off, copy `secret/cigale.sample.yml` to `secret/cigale.yml` and
 edit in your actual credentials.
 
 **Don't actually put your password**, use your Jenkins API key, which
-you can find at <https://lockfree.ch/user/YOUR_JENKINS_USERNAME/configure>
+you can find at <https://ci.itch.ovh/user/YOUR_JENKINS_USERNAME/configure>
 
 Then run:
 
