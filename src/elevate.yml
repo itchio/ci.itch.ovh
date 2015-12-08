@@ -23,10 +23,8 @@
     scm:
       .git: &elevate-git
         host: github.com
-        user: itchio
-        name: elevate
+        repo: itchio/elevate
         branches: '$JENKINS_TAG'
-        wipe: true
     wrappers:
       - ansi-color
       - inject:
@@ -59,7 +57,6 @@
       .git:
         <<: *elevate-git
         branches: '**'
-        wipe: false
     token: 'JILLIAN_BROWN'
     wrappers:
       - ansi-color

@@ -1,4 +1,6 @@
 
+#	( •_•)O*¯`·.¸.·´¯`°Q(•_• )
+
 - job:
     name: wharf
     triggers:
@@ -7,8 +9,7 @@
     scm:
       .git:
         host: bitbucket.org
-        user: itchio
-        name: wharf
+        repo: itchio/wharf
         branches: '**'
     wrappers:
       - ansi-color

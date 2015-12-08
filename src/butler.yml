@@ -6,24 +6,18 @@
     exe: 'butler'
     git: &butler-git
       host: github.com
-      user: itchio
-      name: butler
+      repo: itchio/butler
       branches: '$JENKINS_TAG'
-      wipe: true
 
 - job:
-    # triggered by POST to /job/butler-releases/build?token=XXX
-    # checks if there's a recent tag we haven't built, in which case,
-    # asks `butler` to build that. If there isn't, asks `butler` to build
-    # whatever ('**') which means any commit pushed to any branch
     name: butler-trigger
     node: groovy
     scm:
       .git:
         <<: *butler-git
-        branches: '**'
-        wipe: false
-    token: 'JOLLY_FARM'
+        branches: 'origin/tags/*'
+    triggers:
+      - pollscm
     wrappers:
       - ansi-color
     builders:

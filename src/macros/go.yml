@@ -9,6 +9,7 @@
       parameters:
         - string:
             name: JENKINS_TAG
+            default: '**'
       axes:
         - axis:
             type: label-expression
@@ -25,6 +26,8 @@
               - amd64
       scm:
         - .git-go: '{git}'
+      triggers:
+        - pollscm
       wrappers:
         - ansi-color
         - workspace-cleanup:
@@ -53,7 +56,7 @@
                 export PATH=$PATH:/usr/local/go/bin
               fi
 
-              JENKINS_IMPORT_PATH={git.host}/{git.user}/{git.name}
+              JENKINS_IMPORT_PATH={git.host}/{git.repo}
               go get -v -d $JENKINS_IMPORT_PATH/...
               go build -v -ldflags "$JENKINS_LDFLAGS" $JENKINS_IMPORT_PATH/{pkg}
 
