@@ -10,7 +10,6 @@
         user: itchio
         name: rsync-go
         branches: '**'
-        wipe: true
     wrappers:
       - ansi-color
     builders:

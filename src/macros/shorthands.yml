@@ -26,13 +26,30 @@
     inject:
       properties-content: '{* string}'
 
-- :git:
+- :git-advanced:
     git:
       url: 'git@{host}:{user}/{name}.git'
       credentials-id: 'f5387502-f743-45da-b8d7-1a8bf7d2a54e'
       branches:
         - '{branches}'
-      wipe: '{wipe}'
+      relative-target-dir: '{dir}'
+
+- :git:
+    .git-advanced:
+      host: '{host}'
+      user: '{user}'
+      name: '{name}'
+      branches: '{branches}'
+      dir: '.'
+
+# checks out in a subdirectory suitable for `go get`
+- :git-go:
+    .git-advanced:
+      host: '{host}'
+      user: '{user}'
+      name: '{name}'
+      branches: '{branches}'
+      dir: 'src/{host}/{user}/{name}'
 
 - :deploy-to-gcs:
     conditional-publisher:

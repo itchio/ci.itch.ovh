@@ -23,18 +23,18 @@
             values:
               - 386
               - amd64
-      workspace: 'workspace/{name}/$JENKINS_OS-$JENKINS_ARCH/src/{git.host}/{git.user}/{git.name}'
-      child-workspace: .
       scm:
-        - .git: '{git}'
+        - .git-go: '{git}'
       wrappers:
         - ansi-color
+        - workspace-cleanup:
+            delete-dirs: true
         - inject:
             groovy-script-content:
               .export-jenkins-version:
       builders:
         - shell: |
-              export GOPATH="$WORKSPACE/../../../.."
+              export GOPATH="$WORKSPACE"
               export GOARCH="$JENKINS_ARCH"
               export CGO_ENABLED=1
               export CC_FOR_TARGET="gcc"
@@ -42,9 +42,9 @@
               export JENKINS_LDFLAGS="-X main.version=$JENKINS_VERSION"
 
               TARGET={exe}
-              if [[ "$JENKINS_OS" == "windows" ]]; then
+              if [ "$JENKINS_OS" = "windows" ]; then
                 TARGET=$TARGET.exe
-                if [[ "$JENKINS_ARCH" == "amd64" ]]; then
+                if [ "$JENKINS_ARCH" = "amd64" ]; then
                   export PATH=/mingw64/bin:$PATH
                 else
                   export PATH=/mingw32/bin:$PATH
@@ -53,8 +53,9 @@
                 export PATH=$PATH:/usr/local/go/bin
               fi
 
-              go get -v -d ./...
-              go build -v -ldflags "$JENKINS_LDFLAGS" {pkg}
+              JENKINS_IMPORT_PATH={git.host}/{git.user}/{git.name}
+              go get -v -d $JENKINS_IMPORT_PATH/...
+              go build -v -ldflags "$JENKINS_LDFLAGS" $JENKINS_IMPORT_PATH/{pkg}
 
               file $TARGET
               ./$TARGET -V

@@ -32,14 +32,14 @@
           user: itchio
           name: itchio-app
           branches: '$JENKINS_TAG'
-          wipe: false
+          wipe: true
     builders:
       - shell: |
           node --version
           npm --version
       - shell: |
           npm config set spin false
-          npm install grunt-cli
+          npm install -g grunt-cli
           export PATH=$PATH:$PWD/node_modules/.bin
           npm install
           grunt all
