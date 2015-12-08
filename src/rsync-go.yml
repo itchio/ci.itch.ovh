@@ -3,9 +3,8 @@
     name: rsync-go
     triggers:
       - github
-    workspace: 'workspace/rsync-go/universal/src/github.com/itchio/rsync-go'
     scm:
-      .git:
+      .git-go:
         host: github.com
         repo: itchio/rsync-go
         branches: '**'
@@ -13,6 +12,9 @@
       - ansi-color
     builders:
       - shell: |
-          export GOPATH="$WORKSPACE/../../../.."
-          go get -d -v ./...
-          go test -v
+          export GOPATH="$WORKSPACE"
+
+          JENKINS_IMPORT_PATH=github.com/itchio/rsync-go
+
+          go get -d -v $JENKINS_IMPORT_PATH/...
+          go test -v $JENKINS_IMPORT_PATH

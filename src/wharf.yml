@@ -5,9 +5,8 @@
     name: wharf
     triggers:
       - github
-    workspace: 'workspace/wharf/universal/src/bitbucket.org/itchio/wharf'
     scm:
-      .git:
+      .git-go:
         host: bitbucket.org
         repo: itchio/wharf
         branches: '**'
@@ -15,8 +14,11 @@
       - ansi-color
     builders:
       - shell: |
-          export GOPATH="$WORKSPACE/../../../.."
-          go get -d -v ./...
-          go build -v
+          export GOPATH="$WORKSPACE"
+          JENKINS_IMPORT_PATH=bitbucket.com/itchio/wharf
+
+          go get -d -v $JENKINS_IMPORT_PATH/...
+          go build -v $JENKINS_IMPORT_PATH
+
           file wharf
           7za a wharf.7z wharf

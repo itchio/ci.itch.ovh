@@ -10,20 +10,9 @@
         - string:
             name: JENKINS_TAG
             default: '**'
-      axes:
-        - axis:
-            type: label-expression
-            name: JENKINS_OS
-            values:
-              - windows
-              - darwin
-              - linux
-        - axis:
-            type: user-defined
-            name: JENKINS_ARCH
-            values:
-              - 386
-              - amd64
+      .osarch-axes:
+        os: ['windows', 'darwin', 'linux']
+        arch: ['386', 'amd64']
       scm:
         - .git-go: '{git}'
       triggers:
@@ -62,8 +51,11 @@
 
               file $TARGET
               ./$TARGET -V
-              7za a {exe}.7z $TARGET
-              echo $JENKINS_VERSION > LATEST
+
+              if [ "$JENKINS_DEPLOY" = "1" ]; then
+                7za a {exe}.7z $TARGET
+                echo $JENKINS_VERSION > LATEST
+              fi
       publishers:
         - .deploy-to-gcs:
             package: '{exe}'

@@ -9,23 +9,6 @@
       repo: itchio/butler
       branches: '$JENKINS_TAG'
 
-- job:
-    name: butler-trigger
-    node: groovy
-    scm:
-      .git:
-        <<: *butler-git
-        branches: 'origin/tags/*'
-    triggers:
-      - pollscm
-    wrappers:
-      - ansi-color
-    builders:
-      - groovy:
-          command:
-            .export-latest-tag:
-    publishers:
-      - trigger-parameterized-builds:
-        - project: butler
-          property-file: revision.properties
-          condition: success
+- .trigger-job:
+    project: butler
+    git: *butler-git

@@ -6,20 +6,12 @@
     parameters:
       - string:
           name: JENKINS_TAG
-    axes:
-      - axis:
-          type: label-expression
-          name: JENKINS_OS
-          values:
-            - windows
-      - axis:
-          type: user-defined
-          name: JENKINS_ARCH
-          values:
-            - 386
-            - amd64
+          default: '**'
+    .osarch-axes:
+      os: ['windows']
+      arch: ['386', 'amd64']
     triggers:
-      - github
+      - pollscm
     scm:
       .git: &elevate-git
         host: github.com
@@ -42,30 +34,18 @@
           else
             export PATH=/mingw32/bin:$PATH
           fi
+
           make
           file elevate.exe
-          7za a elevate.7z elevate.exe
-          echo $JENKINS_VERSION > LATEST
+
+          if [ "$JENKINS_DEPLOY" = "1" ]; then
+            7za a elevate.7z $elevate.exe
+            echo $JENKINS_VERSION > LATEST
+          fi
     publishers:
       - .deploy-to-gcs:
           package: 'elevate'
 
-- job:
-    name: elevate-trigger
-    node: groovy
-    scm:
-      .git:
-        <<: *elevate-git
-        branches: '**'
-    token: 'JILLIAN_BROWN'
-    wrappers:
-      - ansi-color
-    builders:
-      - groovy:
-          command:
-            .export-latest-tag:
-    publishers:
-      - trigger-parameterized-builds:
-        - project: elevate
-          property-file: revision.properties
-          condition: success
+- .trigger-job:
+    project: elevate
+    git: *elevate-git
