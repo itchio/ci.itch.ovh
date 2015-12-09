@@ -32,7 +32,6 @@
           npm install -g grunt-cli
           export PATH=$PATH:$PWD/node_modules/.bin
           npm install
-          grunt all
           npm test
 
 - .tag-trigger:
