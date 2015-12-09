@@ -1,0 +1,47 @@
+
+- :tag-trigger:
+    job:
+      name: '{project} ← on tag'
+      node: gcs
+      scm:
+        .git:
+          host: '{git.host}'
+          repo: '{git.repo}'
+          branches: 'origin/tags/*'
+      triggers:
+        - pollscm
+      wrappers:
+        - ansi-color
+        - inject
+      builders:
+        - shell: |
+            TAG_NAME=$(echo $GIT_BRANCH | cut -d '/' -f 3)
+            echo "JENKINS_TAG = $TAG_NAME" > version.prop
+            echo "JENKINS_DEPLOY = 1" >> version.prop
+      publishers:
+        - trigger-parameterized-builds:
+          - project: '{project}'
+            property-file: version.prop
+
+- :commit-trigger:
+    job:
+      name: '{project} ← on commit'
+      node: gcs
+      scm:
+        .git:
+          host: '{git.host}'
+          repo: '{git.repo}'
+          branches: '**'
+      triggers:
+        - pollscm
+      wrappers:
+        - ansi-color
+        - inject
+      builders:
+        - shell: |
+            echo "JENKINS_TAG = **" > version.prop
+            echo "JENKINS_DEPLOY = 0" >> version.prop
+      publishers:
+        - trigger-parameterized-builds:
+          - project: '{project}'
+            property-file: version.prop

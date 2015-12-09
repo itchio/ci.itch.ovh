@@ -1,0 +1,26 @@
+
+- :git-advanced:
+    git:
+      url: 'git@{host}:{repo}.git'
+      credentials-id: 'f5387502-f743-45da-b8d7-1a8bf7d2a54e'
+      branches:
+        - '{branches}'
+      relative-target-dir: '{dir}'
+      refspec: '+refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/remotes/origin/tags/*'
+      wipe: false
+      skip-tag: true
+
+- :git:
+    .git-advanced:
+      host: '{host}'
+      repo: '{repo}'
+      branches: '{branches}'
+      dir: ''
+
+# checks out in a subdirectory suitable for `go get`
+- :git-go:
+    .git-advanced:
+      host: '{host}'
+      repo: '{repo}'
+      branches: '{branches}'
+      dir: 'src/{host}/{repo}'

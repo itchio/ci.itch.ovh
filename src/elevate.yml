@@ -7,11 +7,12 @@
       - string:
           name: JENKINS_TAG
           default: '**'
+      - string:
+          name: JENKINS_DEPLOY
+          default: 0
     .osarch-axes:
       os: ['windows']
       arch: ['386', 'amd64']
-    triggers:
-      - pollscm
     scm:
       .git: &elevate-git
         host: github.com
@@ -19,17 +20,19 @@
         branches: '$JENKINS_TAG'
     wrappers:
       - ansi-color
-      - inject:
-          groovy-script-content:
-            .export-jenkins-version:
+      - inject
     workspace: 'workspace/elevate/$JENKINS_OS-$JENKINS_ARCH'
     builders:
       - shell: |
           cppcheck --error-exitcode=1 src
       - shell: |
+          export JENKINS_VERSION=head
+          if [ "$JENKINS_DEPLOY" = "1" ]; then
+            export JENKINS_VERSION=$JENKINS_TAG
+          fi
           export ELEVATE_CFLAGS="-DELEVATE_VERSION=\\\"$JENKINS_VERSION\\\""
 
-          if [[ "$JENKINS_ARCH" == "amd64" ]]; then
+          if [ "$JENKINS_ARCH" = "amd64" ]; then
             export PATH=/mingw64/bin:$PATH
           else
             export PATH=/mingw32/bin:$PATH
@@ -39,13 +42,17 @@
           file elevate.exe
 
           if [ "$JENKINS_DEPLOY" = "1" ]; then
-            7za a elevate.7z $elevate.exe
+            7za a elevate.7z elevate.exe
             echo $JENKINS_VERSION > LATEST
           fi
     publishers:
       - .deploy-to-gcs:
           package: 'elevate'
 
-- .trigger-job:
+- .tag-trigger:
+    project: elevate
+    git: *elevate-git
+
+- .commit-trigger:
     project: elevate
     git: *elevate-git

@@ -9,6 +9,10 @@
       repo: itchio/butler
       branches: '$JENKINS_TAG'
 
-- .trigger-job:
+- .tag-trigger:
+    project: butler
+    git: *butler-git
+
+- .commit-trigger:
     project: butler
     git: *butler-git

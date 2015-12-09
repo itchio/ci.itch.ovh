@@ -15,7 +15,7 @@
     builders:
       - shell: |
           export GOPATH="$WORKSPACE"
-          JENKINS_IMPORT_PATH=bitbucket.com/itchio/wharf
+          JENKINS_IMPORT_PATH=bitbucket.org/itchio/wharf
 
           go get -d -v $JENKINS_IMPORT_PATH/...
           go build -v $JENKINS_IMPORT_PATH

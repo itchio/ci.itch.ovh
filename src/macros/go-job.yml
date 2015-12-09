@@ -3,27 +3,26 @@
     job:
       name: '{name}'
       project-type: matrix
-      node: 'gcs'
+      node: gcs
       execution-strategy:
         combination-filter: (JENKINS_OS == "darwin").implies(JENKINS_ARCH == "amd64")
       parameters:
         - string:
             name: JENKINS_TAG
             default: '**'
+        - string:
+            name: JENKINS_DEPLOY
+            default: 0
       .osarch-axes:
         os: ['windows', 'darwin', 'linux']
         arch: ['386', 'amd64']
       scm:
         - .git-go: '{git}'
-      triggers:
-        - pollscm
       wrappers:
         - ansi-color
+        - inject
         - workspace-cleanup:
             delete-dirs: true
-        - inject:
-            groovy-script-content:
-              .export-jenkins-version:
       builders:
         - shell: |
               export GOPATH="$WORKSPACE"
@@ -31,6 +30,10 @@
               export CGO_ENABLED=1
               export CC_FOR_TARGET="gcc"
               export CXX_FOR_TARGET="g++"
+              export JENKINS_VERSION="head"
+              if [ "$JENKINS_DEPLOY" = "1" ]; then
+                export JENKINS_VERSION=$JENKINS_TAG
+              fi
               export JENKINS_LDFLAGS="-X main.version=$JENKINS_VERSION"
 
               TARGET={exe}

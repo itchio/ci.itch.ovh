@@ -1,0 +1,38 @@
+
+- :osarch-axes:
+    axes:
+      - axis:
+          type: label-expression
+          name: JENKINS_OS
+          values: '{os}'
+      - axis:
+          type: user-defined
+          name: JENKINS_ARCH
+          values: '{arch}'
+
+- :on-os-arch:
+    conditional-step:
+      condition-kind: regex-match
+      label: $os-$arch
+      regex: '{spec string}'
+      steps: '{do list}'
+
+- :on-deploy:
+    - condition-kind: regex-match
+      label: '$JENKINS_TAG'
+      regex: '^v.*$'
+      action: '{*}'
+
+- :on-windows:
+    .on-os-arch:
+      spec: windows-.*
+      do: '{* list}'
+
+- :on-unix:
+    .on-os-arch:
+      spec: (linux|darwin)-.*
+      do: '{* list}'
+
+- :export:
+    inject:
+      properties-content: '{* string}'
