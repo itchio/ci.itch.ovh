@@ -10,7 +10,7 @@
           delete-dirs: true
       - credentials-binding:
           - text:
-              credentials-id: 85395ee8-f0b4-4adc-8100-aee9509ab159
+              credential-id: 85395ee8-f0b4-4adc-8100-aee9509ab159
               variable: COVERALLS_REPO_TOKEN
     scm:
       - .git: &itch-git
