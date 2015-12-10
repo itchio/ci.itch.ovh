@@ -2,6 +2,10 @@
 - job:
     name: itch
     .matrix-project:
+    parameters:
+      - ..base-parameters:
+    wrappers:
+      - ..base-wrappers:
     scm:
       - .git: &itch-git
           host: github.com

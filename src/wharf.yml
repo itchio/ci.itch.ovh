@@ -1,17 +1,17 @@
 
-#	( •_•)O*¯`·.¸.·´¯`°Q(•_• )
-
 - job:
     name: wharf
-    triggers:
-      - github
     scm:
-      .git-go:
+      .git-go: &wharf-git
         host: bitbucket.org
         repo: itchio/wharf
-        branches: '**'
+        branches: '$JENKINS_TAG'
+    parameters:
+      - ..base-parameters:
     wrappers:
-      - ansi-color
+      - ..base-wrappers:
+      - workspace-cleanup:
+          delete-dirs: true
     builders:
       - shell: |
           export GOPATH="$WORKSPACE"
@@ -19,6 +19,16 @@
 
           go get -d -v $JENKINS_IMPORT_PATH/...
           go build -v $JENKINS_IMPORT_PATH
-
           file wharf
-          7za a wharf.7z wharf
+
+          if [ "$JENKINS_DEPLOY" = "1" ]; then
+            7za a wharf.7z $TARGET
+            echo $JENKINS_VERSION > LATEST
+          fi
+    publishers:
+      - .deploy-to-gcs:
+          package: wharf
+
+- ..standard-triggers:
+    project: wharf
+    git: *wharf-git

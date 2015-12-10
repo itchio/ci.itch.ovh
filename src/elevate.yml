@@ -4,12 +4,7 @@
     project-type: matrix
     node: 'gcs'
     parameters:
-      - string:
-          name: JENKINS_TAG
-          default: '**'
-      - string:
-          name: JENKINS_DEPLOY
-          default: 0
+      - ..base-parameters:
     axes:
       - ..osarch-axes:
           os: ['windows']
@@ -20,8 +15,7 @@
         repo: itchio/elevate
         branches: '$JENKINS_TAG'
     wrappers:
-      - ansi-color
-      - inject
+      - ..base-wrappers:
     workspace: 'workspace/elevate/$JENKINS_OS-$JENKINS_ARCH'
     builders:
       - shell: |

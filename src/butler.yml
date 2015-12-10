@@ -1,13 +1,57 @@
 
-- .go-job:
-    # always triggered by `butler-releases`
+- job:
     name: butler
-    pkg: './cmd/butler'
-    exe: 'butler'
-    git: &butler-git
-      host: github.com
-      repo: itchio/butler
-      branches: '$JENKINS_TAG'
+    .matrix-project:
+    parameters:
+      - ..base-parameters:
+    wrappers:
+      - ..base-wrappers:
+      - workspace-cleanup:
+          delete-dirs: true
+    scm:
+      - .git-go: &butler-git
+          host: github.com
+          repo: itchio/butler
+          branches: '$JENKINS_TAG'
+    builders:
+      - shell: |
+          export GOPATH="$WORKSPACE"
+          export GOARCH="$JENKINS_ARCH"
+          export CGO_ENABLED=1
+          export CC_FOR_TARGET="gcc"
+          export CXX_FOR_TARGET="g++"
+          export JENKINS_VERSION="head"
+          if [ "$JENKINS_DEPLOY" = "1" ]; then
+            export JENKINS_VERSION=$JENKINS_TAG
+          fi
+          export JENKINS_LDFLAGS="-X main.version=$JENKINS_VERSION"
+
+          TARGET=butler
+          if [ "$JENKINS_OS" = "windows" ]; then
+            TARGET=$TARGET.exe
+            if [ "$JENKINS_ARCH" = "amd64" ]; then
+              export PATH=/mingw64/bin:$PATH
+            else
+              export PATH=/mingw32/bin:$PATH
+            fi
+          else
+            export PATH=$PATH:/usr/local/go/bin
+          fi
+
+          JENKINS_IMPORT_PATH=github.com/itchio/butler
+          go get -v -d $JENKINS_IMPORT_PATH/...
+          go build -v -ldflags "$JENKINS_LDFLAGS" $JENKINS_IMPORT_PATH/cmd/butler
+
+          file $TARGET
+          ./$TARGET -V
+
+          if [ "$JENKINS_DEPLOY" = "1" ]; then
+            7za a butler.7z $TARGET
+            echo $JENKINS_VERSION > LATEST
+          fi
+    publishers:
+      - .deploy-to-gcs:
+          package: butler
 
 - ..standard-triggers:
     project: butler
