@@ -32,9 +32,16 @@
             export COVERALLS_SERVICE_NAME=jenkins
             export COVERALLS_SERVICE_JOB_ID=$BUILD_ID
             npm run coveralls
-          end
+          fi
       - shell: |
-          grunt electron:$JENKINS_OS-$JENKINS_ARCH
+          if [ "$JENKINS_DEPLOY" = "1" ]; then
+            grunt electron:$JENKINS_OS-$JENKINS_ARCH
+
+            if [ "$JENKINS_OS" == "windows" ]; then
+              grunt create-windows-installer:$JENKINS_ARCH
+            fi
+          fi
+
 
 - ..standard-triggers:
     project: itch
