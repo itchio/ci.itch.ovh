@@ -32,7 +32,6 @@
           export COVERALLS_SERVICE_JOB_ID=$BUILD_ID
           npm run coveralls
       - shell: |
-          npm prune --production
           grunt electron:$JENKINS_OS-$JENKINS_ARCH
 
 - ..standard-triggers:
