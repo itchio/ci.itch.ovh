@@ -28,9 +28,11 @@
           npm install
           npm test
       - shell: |
-          export COVERALLS_SERVICE_NAME=jenkins
-          export COVERALLS_SERVICE_JOB_ID=$BUILD_ID
-          npm run coveralls
+          if [ "$JENKINS_OS-$JENKINS-ARCH" = "linux-amd64" ]; then
+            export COVERALLS_SERVICE_NAME=jenkins
+            export COVERALLS_SERVICE_JOB_ID=$BUILD_ID
+            npm run coveralls
+          end
       - shell: |
           grunt electron:$JENKINS_OS-$JENKINS_ARCH
 
