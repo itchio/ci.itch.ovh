@@ -9,7 +9,9 @@
         repo: itchio/rsync-go
         branches: '**'
     wrappers:
-      - ansi-color
+      - ..base-wrappers:
+      - workspace-cleanup:
+          delete-dirs: true
     builders:
       - shell: |
           export GOPATH="$WORKSPACE"
