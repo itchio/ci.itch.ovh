@@ -6,6 +6,8 @@
       - ..base-parameters:
     wrappers:
       - ..base-wrappers:
+      - workspace-cleanup:
+          delete-dirs: true
     scm:
       - .git: &itch-git
           host: github.com
