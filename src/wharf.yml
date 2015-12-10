@@ -1,6 +1,7 @@
 
 - job:
     name: wharf
+    node: gcs
     scm:
       .git-go: &wharf-git
         host: bitbucket.org
@@ -28,6 +29,7 @@
     publishers:
       - .deploy-to-gcs:
           package: wharf
+          public: false
 
 - ..standard-triggers:
     project: wharf

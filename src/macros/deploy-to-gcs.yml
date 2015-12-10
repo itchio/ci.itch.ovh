@@ -1,5 +1,7 @@
 
 - :deploy-to-gcs:
+    :defaults:
+      public: true
     conditional-publisher:
       - condition-kind: regex-match
         label: $JENKINS_DEPLOY
@@ -11,8 +13,8 @@
                 - classic:
                     storage-location: 'gs://dl.itch.ovh/{package}/$JENKINS_OS-$JENKINS_ARCH/$JENKINS_VERSION'
                     file-pattern: '{package}.7z'
-                    share-publicly: true
+                    share-publicly: '{public}'
                 - classic:
                     storage-location: 'gs://dl.itch.ovh/{package}/$JENKINS_OS-$JENKINS_ARCH'
                     file-pattern: 'LATEST'
-                    share-publicly: true
+                    share-publicly: '{public}'

@@ -9,10 +9,10 @@
       - workspace-cleanup:
           delete-dirs: true
     scm:
-      - .git-go: &butler-git
-          host: github.com
-          repo: itchio/butler
-          branches: '$JENKINS_TAG'
+      .git-go: &butler-git
+        host: github.com
+        repo: itchio/butler
+        branches: '$JENKINS_TAG'
     builders:
       - shell: |
           export GOPATH="$WORKSPACE"

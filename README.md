@@ -16,7 +16,7 @@ gem install cigale
 
 You should be able to run `cigale` now.
 
-**Note: cigale 0.3.1 or higher is required**
+**Note: cigale 0.4.1 or higher is required**
 
 ## Testing config files
 
