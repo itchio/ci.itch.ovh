@@ -8,6 +8,10 @@
       - ..base-wrappers:
       - workspace-cleanup:
           delete-dirs: true
+      - credentials-binding:
+          - text:
+              credentials-id: 85395ee8-f0b4-4adc-8100-aee9509ab159
+              variable: COVERALLS_REPO_TOKEN
     scm:
       - .git: &itch-git
           host: github.com
@@ -23,6 +27,10 @@
           export PATH=$PATH:$PWD/node_modules/.bin
           npm install
           npm test
+      - shell: |
+          export COVERALLS_SERVICE_NAME=jenkins
+          export COVERALLS_SERVICE_JOB_ID=$BUILD_ID
+          npm coveralls
 
 - ..standard-triggers:
     project: itch
