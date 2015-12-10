@@ -38,7 +38,7 @@
 
           if [ "$JENKINS_DEPLOY" = "1" ]; then
             7za a elevate.7z elevate.exe
-            echo $JENKINS_VERSION > LATEST
+            echo $JENKINS_TAG > LATEST
           fi
     publishers:
       - .deploy-to-gcs:

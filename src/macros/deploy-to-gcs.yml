@@ -11,7 +11,7 @@
               credentials-id: butler-server-1131
               uploads:
                 - classic:
-                    storage-location: 'gs://dl.itch.ovh/{package}/$JENKINS_OS-$JENKINS_ARCH/$JENKINS_VERSION'
+                    storage-location: 'gs://dl.itch.ovh/{package}/$JENKINS_OS-$JENKINS_ARCH/$JENKINS_TAG'
                     file-pattern: '{package}.7z'
                     share-publicly: '{public}'
                 - classic:
