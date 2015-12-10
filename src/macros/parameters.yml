@@ -1,0 +1,8 @@
+
+- :base-parameters:
+    - string:
+        name: JENKINS_TAG
+        default: '**'
+    - string:
+        name: JENKINS_DEPLOY
+        default: 0

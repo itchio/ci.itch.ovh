@@ -1,23 +1,7 @@
 
 - job:
     name: itch
-    project-type: matrix
-    node: gcs
-    execution-strategy:
-      combination-filter: (JENKINS_OS == "darwin").implies(JENKINS_ARCH == "amd64")
-    parameters:
-      - string:
-          name: JENKINS_TAG
-          default: '**'
-      - string:
-          name: JENKINS_DEPLOY
-          default: 0
-    .osarch-axes:
-      os: ['windows', 'darwin', 'linux']
-      arch: ['386', 'amd64']
-    wrappers:
-      - inject
-      - ansi-color
+    .matrix-project:
     scm:
       - .git: &itch-git
           host: github.com
@@ -34,10 +18,6 @@
           npm install
           npm test
 
-- .tag-trigger:
-    project: itch
-    git: *itch-git
-
-- .commit-trigger:
+- ..standard-triggers:
     project: itch
     git: *itch-git

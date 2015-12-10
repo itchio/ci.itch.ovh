@@ -1,4 +1,8 @@
 
+- :standard-triggers:
+    - .tag-trigger: '{*}'
+    - .commit-trigger: '{*}'
+
 - :tag-trigger:
     job:
       name: '{project} ← on tag'

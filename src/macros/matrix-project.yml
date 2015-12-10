@@ -1,0 +1,14 @@
+
+- :matrix-project:
+    node: gcs
+    project-type: matrix
+    execution-strategy:
+      combination-filter: (JENKINS_OS == "darwin").implies(JENKINS_ARCH == "amd64")
+    wrappers:
+      - ..base-wrappers:
+    parameters:
+      - ..base-parameters:
+    axes:
+      - ..osarch-axes:
+          os: ['windows', 'darwin', 'linux']
+          arch: ['386', 'amd64']

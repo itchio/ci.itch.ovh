@@ -1,14 +1,13 @@
 
 - :osarch-axes:
-    axes:
-      - axis:
-          type: label-expression
-          name: JENKINS_OS
-          values: '{os}'
-      - axis:
-          type: user-defined
-          name: JENKINS_ARCH
-          values: '{arch}'
+    - axis:
+        type: label-expression
+        name: JENKINS_OS
+        values: '{os}'
+    - axis:
+        type: user-defined
+        name: JENKINS_ARCH
+        values: '{arch}'
 
 - :on-os-arch:
     conditional-step:

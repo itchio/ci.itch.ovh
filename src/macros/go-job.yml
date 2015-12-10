@@ -13,9 +13,10 @@
         - string:
             name: JENKINS_DEPLOY
             default: 0
-      .osarch-axes:
-        os: ['windows', 'darwin', 'linux']
-        arch: ['386', 'amd64']
+      axes:
+        - ..osarch-axes:
+            os: ['windows', 'darwin', 'linux']
+            arch: ['386', 'amd64']
       scm:
         - .git-go: '{git}'
       wrappers:
