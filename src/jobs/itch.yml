@@ -43,7 +43,7 @@
             grunt electron:$JENKINS_OS-$JENKINS_ARCH
 
             if [ "$JENKINS_OS" == "windows" ]; then
-              grunt create-windows-installer:$JENKINS_ARCH
+              grunt -v create-windows-installer:$JENKINS_ARCH
             fi
           fi
 
