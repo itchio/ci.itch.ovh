@@ -40,7 +40,7 @@
             babel -D -d stage/app app
             cp -rf node_modules package.json stage/
 
-            grunt electron:$JENKINS_OS-$JENKINS_ARCH
+            grunt -v electron:$JENKINS_OS-$JENKINS_ARCH
 
             if [ "$JENKINS_OS" == "windows" ]; then
               grunt -v create-windows-installer:$JENKINS_ARCH
