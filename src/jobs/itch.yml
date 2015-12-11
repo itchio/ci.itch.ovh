@@ -35,6 +35,11 @@
           fi
       - shell: |
           if [ "$JENKINS_DEPLOY" = "1" ]; then
+            mkdir stage
+            npm install babel-cli@6
+            babel -D -d stage/app app
+            cp -rf node_modules package.json stage/
+
             grunt electron:$JENKINS_OS-$JENKINS_ARCH
 
             if [ "$JENKINS_OS" == "windows" ]; then
