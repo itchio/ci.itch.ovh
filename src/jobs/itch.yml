@@ -38,6 +38,7 @@
             mkdir stage
             npm install babel-cli@6
             babel -D -d stage/app app
+            sassc app/style/main.scss stage/app/style/main.css
             cp -rf node_modules package.json stage/
 
             grunt -v electron:$JENKINS_OS-$JENKINS_ARCH
