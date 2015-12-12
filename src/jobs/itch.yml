@@ -42,7 +42,7 @@
           fi
       - shell: |
           if [ "$JENKINS_DEPLOY" = "1" ]; then
-            npm install babel-cli@6
+            npm install -g babel-cli@6
 
             TASKS="prepare electron:$JENKINS_OS-$JENKINS_ARCH"
 
