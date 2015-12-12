@@ -2,6 +2,7 @@
 - job:
     name: itch
     .matrix-project:
+      combination-filter: '(JENKINS_OS == "darwin").implies(JENKINS_ARCH == "amd64") && (JENKINS_OS == "windows").implies(JENKINS_ARCH == "386")'
     parameters:
       - ..base-parameters:
     wrappers:
@@ -35,17 +36,15 @@
           fi
       - shell: |
           if [ "$JENKINS_DEPLOY" = "1" ]; then
-            mkdir stage
             npm install babel-cli@6
-            babel -D -d stage/app app
-            sassc app/style/main.scss stage/app/style/main.css
-            cp -rf node_modules package.json stage/
 
-            grunt -v electron:$JENKINS_OS-$JENKINS_ARCH
+            TASKS="prepare electron:$JENKINS_OS-$JENKINS_ARCH"
 
             if [ "$JENKINS_OS" = "windows" ]; then
-              grunt -v create-windows-installer:$JENKINS_ARCH
+              TASKS="$TASKS create-windows-installer:$JENKINS_ARCH"
             fi
+
+            grunt -v $TASKS
           fi
 
 
