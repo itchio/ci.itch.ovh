@@ -1,9 +1,11 @@
 
 - :matrix-project:
+    :defaults:
+      combination-filter: '(JENKINS_OS == "darwin").implies(JENKINS_ARCH == "amd64")'
     node: gcs
     project-type: matrix
     execution-strategy:
-      combination-filter: (JENKINS_OS == "darwin").implies(JENKINS_ARCH == "amd64")
+      combination-filter: '{combination-filter}'
     axes:
       - ..osarch-axes:
           os: ['windows', 'darwin', 'linux']
