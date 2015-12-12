@@ -53,15 +53,16 @@
             grunt -v $TASKS
 
             if [ "$JENKINS_OS" = "darwin" ]; then
-              APP_BUILD_PATH="build/$JENKINS_TAG"
+              APP_BUILD_PATH="build/$JENKINS_TAG/itch-$JENKINS_OS-$JENKINS_ARCH"
               APP_BUNDLE_PATH="$APP_BUILD_PATH/itch.app"
-              APP_ARCHIVE_PATH="itch-mac.zip"
+              APP_ARCHIVE_PATH="$WORKSPACE/itch-mac.zip"
 
               codesign --deep --force --verbose --sign 'Developer ID Application: Amos Wenger (B2N6FSRTPV)' $APP_BUNDLE_PATH
               codesign --verify -vvvv $APP_BUNDLE_PATH
               spctl -a -vvvv $APP_BUNDLE_PATH
 
-              (cd $APP_BUILD_PATH && 7za a ../../itch-mac.zip itch.app)
+              (cd $APP_BUILD_PATH && 7za a $APP_ARCHIVE_PATH *)
+              ls -lhA $APP_ARCHIVE_PATH
             fi
           fi
 
