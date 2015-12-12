@@ -63,34 +63,34 @@
           grunt -v $TASKS
 
           if [ "$JENKINS_OS" = "darwin" ]; then
-            APP_BUNDLE_PATH="$BUILD_PATH/itch.app"
-            APP_ARCHIVE_PATH="$WORKSPACE/itch-mac.zip"
+            OSX_SIGN_KEY="Developer ID Application: Amos Wenger (B2N6FSRTPV)"
+            ditto -v $BUILD_PATH/itch.app itch.app
 
-            codesign --deep --force --verbose --sign 'Developer ID Application: Amos Wenger (B2N6FSRTPV)' $APP_BUNDLE_PATH
-            codesign --verify -vvvv $APP_BUNDLE_PATH
-            spctl -a -vvvv $APP_BUNDLE_PATH
+            codesign --deep --force --verbose --sign "$OSX_SIGN_KEY" itch.app
+            codesign --verify -vvvv itch.app
+            spctl -a -vvvv itch.app
 
-            (cd $BUILD_PATH && 7za a $APP_ARCHIVE_PATH *)
-            ls -lhA $APP_ARCHIVE_PATH
+            7za a itch-mac.zip itch.app
+
+            npm install -g appdmg
+            appdmg release/appdmg.json itch-mac.dmg
           fi
 
           if [ "$JENKINS_OS" = "linux" ]; then
             DEB_VERSION=$(echo $JENKINS_TAG | sed 's/^v//')
-            DEB_URL="https://github.com/itchio/itch"
-            DEB_DESC="The best way to play itch.io games"
 
             rm -rf stage2 && mkdir -p stage2/itch
-            cp -rfv $BUILD_PATH/* stage2/itch
+            cp -rf $BUILD_PATH/* stage2/itch
             fpm --force \
               -C stage2 \
               -s dir -t deb \
               --deb-compression xz \
               -n itch \
-              --description $DEB_DESC \
-              --url $DEB_URL \
-              -v $DEB_VERSION \
-              -m "amos@itch.io" \
-              --license MIT \
+              --description "The best way to play itch.io games" \
+              --url "https://github.com/itchio/itch" \
+              --version "$DEB_VERSION" \
+              --maintainer "amos@itch.io" \
+              --license "MIT" \
               --vendor "itch.io" \
               --category "games" \
               --after-install "$WORKSPACE/release/register-scheme-handler.sh" \
