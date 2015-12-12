@@ -41,31 +41,71 @@
             npm run coveralls
           fi
       - shell: |
-          if [ "$JENKINS_DEPLOY" = "1" ]; then
-            npm install -g babel-cli@6
-
-            TASKS="prepare electron:$JENKINS_OS-$JENKINS_ARCH"
-
-            if [ "$JENKINS_OS" = "windows" ]; then
-              TASKS="$TASKS create-windows-installer:$JENKINS_ARCH"
-            fi
-
-            grunt -v $TASKS
-
-            if [ "$JENKINS_OS" = "darwin" ]; then
-              APP_BUILD_PATH="build/$JENKINS_TAG/itch-$JENKINS_OS-$JENKINS_ARCH"
-              APP_BUNDLE_PATH="$APP_BUILD_PATH/itch.app"
-              APP_ARCHIVE_PATH="$WORKSPACE/itch-mac.zip"
-
-              codesign --deep --force --verbose --sign 'Developer ID Application: Amos Wenger (B2N6FSRTPV)' $APP_BUNDLE_PATH
-              codesign --verify -vvvv $APP_BUNDLE_PATH
-              spctl -a -vvvv $APP_BUNDLE_PATH
-
-              (cd $APP_BUILD_PATH && 7za a $APP_ARCHIVE_PATH *)
-              ls -lhA $APP_ARCHIVE_PATH
-            fi
+          if [ "$JENKINS_DEPLOY" != "1" ]; then
+            exit 0
           fi
 
+          npm install -g babel-cli@6
+
+          if [ "$JENKINS_ARCH" = "386" ]; then
+            ELECTRON_ARCH="ia32"
+          else
+            ELECTRON_ARCH="x64"
+          fi
+
+          BUILD_PATH="build/$JENKINS_TAG/itch-$JENKINS_OS-$ELECTRON_ARCH"
+          TASKS="prepare electron:$JENKINS_OS-$ELECTRON_ARCH"
+
+          if [ "$JENKINS_OS" = "windows" ]; then
+            TASKS="$TASKS create-windows-installer:$ELECTRON_ARCH"
+          fi
+
+          grunt -v $TASKS
+
+          if [ "$JENKINS_OS" = "darwin" ]; then
+            APP_BUNDLE_PATH="$BUILD_PATH/itch.app"
+            APP_ARCHIVE_PATH="$WORKSPACE/itch-mac.zip"
+
+            codesign --deep --force --verbose --sign 'Developer ID Application: Amos Wenger (B2N6FSRTPV)' $APP_BUNDLE_PATH
+            codesign --verify -vvvv $APP_BUNDLE_PATH
+            spctl -a -vvvv $APP_BUNDLE_PATH
+
+            (cd $BUILD_PATH && 7za a $APP_ARCHIVE_PATH *)
+            ls -lhA $APP_ARCHIVE_PATH
+          fi
+
+          if [ "$JENKINS_OS" = "linux" ]; then
+            DEB_VERSION=$(echo $JENKINS_TAG | sed 's/^v//')
+            DEB_URL="https://github.com/itchio/itch"
+            DEB_DESC="The best way to play itch.io games"
+
+            rm -rf stage2 && mkdir -p stage2/itch
+            cp -rfv $BUILD_PATH/* stage2/itch
+            fpm --force \
+              -C stage2 \
+              -s dir -t deb \
+              --deb-compression xz \
+              -n itch \
+              --description $DEB_DESC \
+              --url $DEB_URL \
+              -v $DEB_VERSION \
+              -m "amos@itch.io" \
+              --license MIT \
+              --vendor "itch.io" \
+              --category "games" \
+              --after-install "$WORKSPACE/release/register-scheme-handler.sh" \
+              -d "p7zip-full (> 0)" \
+              itch=/opt \
+              $WORKSPACE/release/itch.sh=/usr/bin/itch \
+              $WORKSPACE/release/icons/icon16.png=/usr/share/icons/hicolor/16x16/apps/itch.png \
+              $WORKSPACE/release/icons/icon32.png=/usr/share/icons/hicolor/32x32/apps/itch.png \
+              $WORKSPACE/release/icons/icon36.png=/usr/share/icons/hicolor/36x36/apps/itch.png \
+              $WORKSPACE/release/icons/icon48.png=/usr/share/icons/hicolor/48x48/apps/itch.png \
+              $WORKSPACE/release/icons/icon64.png=/usr/share/icons/hicolor/64x64/apps/itch.png \
+              $WORKSPACE/release/icons/icon72.png=/usr/share/icons/hicolor/72x72/apps/itch.png \
+              $WORKSPACE/release/icons/icon144.png=/usr/share/icons/hicolor/144x144/apps/itch.png \
+              $WORKSPACE/release/icons/icon512.png=/usr/share/icons/hicolor/512x512/apps/itch.png
+          fi
 
 - ..standard-triggers:
     project: itch
