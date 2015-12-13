@@ -57,17 +57,7 @@
           export GITHUB_USER=itchio
           export GITHUB_REPO=itch
 
-          upload () {
-            # Let lord GitHub not be 502'ing, and I will upload one more time...
-            for i in 1 2 3 4 5; do
-              github-release upload \
-                --tag "$JENKINS_TAG" \
-                --name "$(basename $1)" \
-                --file "$1" \
-                && break \
-                || sleep 15
-            done
-          }
+          UPLOADS=""
 
           if [ "$JENKINS_ARCH" = "386" ]; then
             ELECTRON_ARCH="ia32"
@@ -85,7 +75,7 @@
           grunt -v $TASKS
 
           if [ "$JENKINS_OS" = "windows" ]; then
-            for f in build/squirrel-ia32/*; upload $f
+            UPLOADS="$UPLOADS $(echo build/squirrel/ia32/*)"
           fi
 
           if [ "$JENKINS_OS" = "darwin" ]; then
@@ -101,7 +91,7 @@
             npm install -g appdmg
             appdmg release/appdmg.json itch-mac.dmg
 
-            for f in itch-mac.zip itch-mac.dmg; upload $f
+            UPLOADS="$UPLOADS itch-mac.zip itch-mac.dmg"
           fi
 
           if [ "$JENKINS_OS" = "linux" ]; then
@@ -136,6 +126,27 @@
               ../release/icons/icon144.png=/usr/share/icons/hicolor/144x144/apps/itch.png \
               ../release/icons/icon512.png=/usr/share/icons/hicolor/512x512/apps/itch.png
           fi
+
+          # Let lord GitHub not be 502'ing, and I will upload one more time - the Devops bible
+          for f in $(echo $UPLOADS); do
+            success=""
+            for i in 1 2 3 4 5; do
+              github-release upload \
+                      --tag "$JENKINS_TAG" \
+                      --name "$(basename $f)" \
+                      --file "$f"
+              if [ "$?" = "0" ]; then
+                success="yay"
+                break
+              else
+                echo "Retrying upload of $f (try $i)"
+              fi
+            done
+
+            if [ "$success" != "yay" ]; then
+              echo "Could not upload $f, despite our best efforts. Bailing out."
+            fi
+          done
 
 - .commit-trigger:
     project: itch
