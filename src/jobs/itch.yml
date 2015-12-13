@@ -50,8 +50,9 @@
 
           npm install -g babel-cli@6
 
-          export GOPATH="$WORKSPACE"
-          export PATH=$PATH:$GOPATH/bin
+          export $GOPATH="$HOME/go"
+          mkdir -p $GOPATH
+          export PATH="$PATH:$GOPATH"
           go get github.com/aktau/github-release
 
           if [ "$JENKINS_ARCH" = "386" ]; then
@@ -116,6 +117,32 @@
               ../release/icons/icon512.png=/usr/share/icons/hicolor/512x512/apps/itch.png
           fi
 
-- ..standard-triggers:
+- .commit-trigger:
     project: itch
     git: *itch-git
+
+- .tag-trigger:
+    project: itch
+    git: *itch-git
+    wrappers:
+      - credentials-binding:
+          - text:
+              credential-id: 06e1f5e8-9ccc-4d33-9dcf-450565d79781
+              variable: GITHUB_TOKEN
+    post-builders:
+      - inject:
+          properties-file: version.prop
+      - shell: |
+          echo "Creating GitHub release for $JENKINS_TAG"
+
+          export $GOPATH="$HOME/go"
+          mkdir -p $GOPATH
+          export PATH="$PATH:$GOPATH"
+          go get github.com/aktau/github-release
+
+          github-release release \
+            --user itchio \
+            --repo itch \
+            --tag "$JENKINS_TAG" \
+            --draft \
+            --pre-release

@@ -3,7 +3,13 @@
     - .tag-trigger: '{*}'
     - .commit-trigger: '{*}'
 
+- :identity: '{*}'
+
 - :tag-trigger:
+    :defaults:
+      wrappers: []
+      pre-builders: []
+      post-builders: []
     job:
       name: '{project} ← on tag'
       node: gcs
@@ -15,13 +21,16 @@
       triggers:
         - pollscm
       wrappers:
+        - ..identity: '{wrappers}'
         - ansi-color
         - inject
       builders:
+        - ..identity: '{pre-builders}'
         - shell: |
             TAG_NAME=$(echo $GIT_BRANCH | cut -d '/' -f 3)
             echo "JENKINS_TAG = $TAG_NAME" > version.prop
             echo "JENKINS_DEPLOY = 1" >> version.prop
+        - ..identity: '{post-builders}'
       publishers:
         - trigger-parameterized-builds:
           - project: '{project}'

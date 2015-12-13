@@ -56,8 +56,8 @@
           else
             TRIPLET=""
           fi
-          export CC_FOR_TARGET="$TRIPLETgcc"
-          export CXX_FOR_TARGET="$TRIPLETg++"
+          export CC="${TRIPLET}gcc"
+          export CXX="${TRIPLET}g++"
 
           export JENKINS_VERSION="head"
           if [ "$JENKINS_DEPLOY" = "1" ]; then
@@ -74,7 +74,7 @@
 
           JENKINS_IMPORT_PATH=github.com/itchio/butler
           go get -v -d $JENKINS_IMPORT_PATH/...
-          gox -osarch "$JENKINS_OS/$JENKINS_ARCH" -v -ldflags "$JENKINS_LDFLAGS" -cgo -output="butler" $JENKINS_IMPORT_PATH/cmd/butler
+          gox -osarch "$JENKINS_OS/$JENKINS_ARCH" -ldflags "$JENKINS_LDFLAGS" -cgo -output="butler" $JENKINS_IMPORT_PATH/cmd/butler
 
           file $TARGET
           ./$TARGET -V
