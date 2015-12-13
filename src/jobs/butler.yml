@@ -8,7 +8,7 @@
     axes:
       - axis:
           type: label-expression
-          name: JENKIS_XOS
+          name: JENKINS_XOS
           values:
             - windows
             - darwin
