@@ -93,18 +93,18 @@
               --license "MIT" \
               --vendor "itch.io" \
               --category "games" \
-              --after-install "$WORKSPACE/release/register-scheme-handler.sh" \
               -d "p7zip-full (> 0)" \
               itch=/opt \
-              $WORKSPACE/release/itch.sh=/usr/bin/itch \
-              $WORKSPACE/release/icons/icon16.png=/usr/share/icons/hicolor/16x16/apps/itch.png \
-              $WORKSPACE/release/icons/icon32.png=/usr/share/icons/hicolor/32x32/apps/itch.png \
-              $WORKSPACE/release/icons/icon36.png=/usr/share/icons/hicolor/36x36/apps/itch.png \
-              $WORKSPACE/release/icons/icon48.png=/usr/share/icons/hicolor/48x48/apps/itch.png \
-              $WORKSPACE/release/icons/icon64.png=/usr/share/icons/hicolor/64x64/apps/itch.png \
-              $WORKSPACE/release/icons/icon72.png=/usr/share/icons/hicolor/72x72/apps/itch.png \
-              $WORKSPACE/release/icons/icon144.png=/usr/share/icons/hicolor/144x144/apps/itch.png \
-              $WORKSPACE/release/icons/icon512.png=/usr/share/icons/hicolor/512x512/apps/itch.png
+              ../release/itch.sh=/usr/bin/itch \
+              ../release/itch.desktop=/usr/share/applications/itch.desktop \
+              ../release/icons/icon16.png=/usr/share/icons/hicolor/16x16/apps/itch.png \
+              ../release/icons/icon32.png=/usr/share/icons/hicolor/32x32/apps/itch.png \
+              ../release/icons/icon36.png=/usr/share/icons/hicolor/36x36/apps/itch.png \
+              ../release/icons/icon48.png=/usr/share/icons/hicolor/48x48/apps/itch.png \
+              ../release/icons/icon64.png=/usr/share/icons/hicolor/64x64/apps/itch.png \
+              ../release/icons/icon72.png=/usr/share/icons/hicolor/72x72/apps/itch.png \
+              ../release/icons/icon144.png=/usr/share/icons/hicolor/144x144/apps/itch.png \
+              ../release/icons/icon512.png=/usr/share/icons/hicolor/512x512/apps/itch.png
           fi
 
 - ..standard-triggers:
