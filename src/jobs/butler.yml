@@ -1,7 +1,24 @@
 
 - job:
     name: butler
-    .matrix-project:
+    node: gcs
+    project-type: matrix
+    execution-strategy:
+      combination-filter: '(JENKINS_XOS == "darwin").implies(JENKINS_ARCH == "amd64")'
+    axes:
+      - axis:
+          type: label-expression
+          name: JENKIS_XOS
+          values:
+            - windows
+            - darwin
+            - geezer
+      - axis:
+          type: user-defined
+          name: JENKINS_ARCH
+          values:
+            - 386
+            - amd64
     parameters:
       - ..base-parameters:
     wrappers:
@@ -15,11 +32,31 @@
         branches: '$JENKINS_TAG'
     builders:
       - shell: |
+          echo > env.properties
+          if [ "$JENKINS_XOS" = "geezer" ]; then
+            echo "JENKINS_OS=linux" >> env.properties
+          else
+            echo "JENKINS_OS=$JENKINS_XOS" >> env.properties
+          fi
+      - inject:
+          properties-file: env.properties
+      - shell: |
           export GOPATH="$WORKSPACE"
+          export GOOS="JENKINS_OS"
           export GOARCH="$JENKINS_ARCH"
           export CGO_ENABLED=1
-          export CC_FOR_TARGET="gcc"
-          export CXX_FOR_TARGET="g++"
+          if [ "$JENKINS_OS" = "windows" ]; then
+            if [ "$JENKINS_ARCH" = "386" ]; then
+              TRIPLET="i686-w64-mingw32-"
+            else
+              TRIPLET="x86_64-w64-mingw32-"
+            fi
+          else
+            TRIPLET=""
+          fi
+          export CC_FOR_TARGET="$TRIPLETgcc"
+          export CXX_FOR_TARGET="$TRIPLETg++"
+
           export JENKINS_VERSION="head"
           if [ "$JENKINS_DEPLOY" = "1" ]; then
             export JENKINS_VERSION=$JENKINS_TAG
@@ -29,11 +66,6 @@
           TARGET=butler
           if [ "$JENKINS_OS" = "windows" ]; then
             TARGET=$TARGET.exe
-            if [ "$JENKINS_ARCH" = "amd64" ]; then
-              export PATH=/mingw64/bin:$PATH
-            else
-              export PATH=/mingw32/bin:$PATH
-            fi
           else
             export PATH=$PATH:/usr/local/go/bin
           fi
