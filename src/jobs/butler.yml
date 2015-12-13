@@ -41,9 +41,8 @@
       - inject:
           properties-file: env.properties
       - shell: |
+          go get github.com/mitchellh/gox
           export GOPATH="$WORKSPACE"
-          export GOOS="$JENKINS_OS"
-          export GOARCH="$JENKINS_ARCH"
           export CGO_ENABLED=1
           if [ "$JENKINS_OS" = "windows" ]; then
             if [ "$JENKINS_ARCH" = "386" ]; then
@@ -72,7 +71,7 @@
 
           JENKINS_IMPORT_PATH=github.com/itchio/butler
           go get -v -d $JENKINS_IMPORT_PATH/...
-          go build -v -ldflags "$JENKINS_LDFLAGS" $JENKINS_IMPORT_PATH/cmd/butler
+          gox -osarch "$JENKINS_OS/$JENKINS_ARCH" -v -ldflags "$JENKINS_LDFLAGS" -cgo -output="butler" $JENKINS_IMPORT_PATH/cmd/butler
 
           file $TARGET
           ./$TARGET -V
