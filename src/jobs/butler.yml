@@ -42,7 +42,7 @@
           properties-file: env.properties
       - shell: |
           export GOPATH="$WORKSPACE"
-          export GOOS="JENKINS_OS"
+          export GOOS="$JENKINS_OS"
           export GOARCH="$JENKINS_ARCH"
           export CGO_ENABLED=1
           if [ "$JENKINS_OS" = "windows" ]; then
