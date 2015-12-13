@@ -57,7 +57,7 @@
           export GITHUB_USER=itchio
           export GITHUB_REPO=itch
 
-          upload (file) {
+          upload () {
             # Let lord GitHub not be 502'ing, and I will upload one more time...
             for i in 1 2 3 4 5; do
               github-release upload \
@@ -167,11 +167,11 @@
           OLD_TAG="$(git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags | tail -2 | head -1 | cut -d ' ' -f 1 | cut -d '/' -f 3)"
           echo "Previous tag: $OLD_TAG"
 
-          CHANGELOG="$(git log --oneline --no-merges $OLD_TAG..v0.7.2 | cut -c 9- | sed 's/^/  * /')"
+          CHANGELOG="$(git log --oneline --no-merges $OLD_TAG..$JENKINS_TAG | cut -c 9- | sed 's/^/  * /')"
           echo "Changelog:\n\n$CHANGELOG\n\n"
 
           github-release delete \
-            --tag "$JENKINS_TAG"
+            --tag "$JENKINS_TAG" || echo "Well that's fine!"
 
           github-release release \
             --tag "$JENKINS_TAG" \
