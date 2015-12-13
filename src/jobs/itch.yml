@@ -19,6 +19,9 @@
           - text:
               credential-id: 85395ee8-f0b4-4adc-8100-aee9509ab159
               variable: COVERALLS_REPO_TOKEN
+          - text:
+              credential-id: 06e1f5e8-9ccc-4d33-9dcf-450565d79781
+              variable: GITHUB_TOKEN
     scm:
       - .git: &itch-git
           host: github.com
@@ -46,6 +49,10 @@
           fi
 
           npm install -g babel-cli@6
+
+          export GOPATH="$WORKSPACE"
+          export PATH=$PATH:$GOPATH/bin
+          go get github.com/aktau/github-release
 
           if [ "$JENKINS_ARCH" = "386" ]; then
             ELECTRON_ARCH="ia32"

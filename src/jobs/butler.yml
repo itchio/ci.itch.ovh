@@ -41,9 +41,12 @@
       - inject:
           properties-file: env.properties
       - shell: |
-          go get github.com/mitchellh/gox
           export GOPATH="$WORKSPACE"
+          export PATH="$PATH:$GOPATH/bin"
           export CGO_ENABLED=1
+
+          go get github.com/mitchellh/gox
+
           if [ "$JENKINS_OS" = "windows" ]; then
             if [ "$JENKINS_ARCH" = "386" ]; then
               TRIPLET="i686-w64-mingw32-"
