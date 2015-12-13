@@ -78,7 +78,7 @@
                 --tag "$JENKINS_TAG" \
                 --name "$(basename $i)" \
                 --file "$i"
-            end
+            done
           fi
 
           if [ "$JENKINS_OS" = "darwin" ]; then
@@ -99,7 +99,7 @@
                 --tag "$JENKINS_TAG" \
                 --name "$(basename $i)" \
                 --file "$i"
-            end
+            done
           fi
 
           if [ "$JENKINS_OS" = "linux" ]; then
