@@ -57,6 +57,18 @@
           export GITHUB_USER=itchio
           export GITHUB_REPO=itch
 
+          upload (file) {
+            # Let lord GitHub not be 502'ing, and I will upload one more time...
+            for i in 1 2 3 4 5; do
+              github-release upload \
+                --tag "$JENKINS_TAG" \
+                --name "$(basename $1)" \
+                --file "$1" \
+                && break \
+                || sleep 15
+            done
+          }
+
           if [ "$JENKINS_ARCH" = "386" ]; then
             ELECTRON_ARCH="ia32"
           else
@@ -73,12 +85,7 @@
           grunt -v $TASKS
 
           if [ "$JENKINS_OS" = "windows" ]; then
-            for i in build/squirrel-ia32/*; do
-              github-release upload \
-                --tag "$JENKINS_TAG" \
-                --name "$(basename $i)" \
-                --file "$i"
-            done
+            for f in build/squirrel-ia32/*; upload $f
           fi
 
           if [ "$JENKINS_OS" = "darwin" ]; then
@@ -94,12 +101,7 @@
             npm install -g appdmg
             appdmg release/appdmg.json itch-mac.dmg
 
-            for i in itch-mac.zip itch-mac.dmg; do
-              github-release upload \
-                --tag "$JENKINS_TAG" \
-                --name "$(basename $i)" \
-                --file "$i"
-            done
+            for f in itch-mac.zip itch-mac.dmg; upload $f
           fi
 
           if [ "$JENKINS_OS" = "linux" ]; then
