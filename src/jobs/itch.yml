@@ -34,6 +34,10 @@
           host: github.com
           repo: itchio/itch
           branches: '$JENKINS_TAG'
+    publishers:
+      - email:
+          recipients: amos@itchio
+          send-to-individuals: true
     builders:
       - shell: |
           echo > env.properties
