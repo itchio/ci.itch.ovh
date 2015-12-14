@@ -74,6 +74,7 @@
           go get github.com/aktau/github-release
           export GITHUB_USER=itchio
           export GITHUB_REPO=itch
+          export JENKINS_VERSION=$(echo $JENKINS_TAG | sed 's/^v//')
 
           UPLOADS=""
 
@@ -96,7 +97,7 @@
           grunt -v $TASKS
 
           if [ "$JENKINS_OS" = "windows" ]; then
-            UPLOADS="$UPLOADS $(echo build/squirrel-ia32/*)"
+            UPLOADS="$UPLOADS $(echo build/squirrel-ia32/itch-${JENKINS_VERSION}*.nupkg build/*.exe build/RELEASES)"
           fi
 
           if [ "$JENKINS_OS" = "darwin" ]; then
@@ -116,7 +117,7 @@
           fi
 
           if [ "$JENKINS_OS" = "linux" ]; then
-            DEB_VERSION=$(echo $JENKINS_TAG | sed 's/^v//')
+            DEB_VERSION=$JENKINS_VERSION
 
             rm -rf stage2 && mkdir -p stage2/itch
             cp -rf $BUILD_PATH/* stage2/itch
