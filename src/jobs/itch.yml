@@ -96,7 +96,7 @@
           grunt -v $TASKS
 
           if [ "$JENKINS_OS" = "windows" ]; then
-            UPLOADS="$UPLOADS $(echo build/squirrel/ia32/*)"
+            UPLOADS="$UPLOADS $(echo build/squirrel-ia32/*)"
           fi
 
           if [ "$JENKINS_OS" = "darwin" ]; then
