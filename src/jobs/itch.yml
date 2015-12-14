@@ -18,6 +18,14 @@
            - amd64
     parameters:
       - ..base-parameters:
+    properties:
+      - slack:
+          notify:
+            start: true
+            success: true
+            aborted: true
+            failure: true
+          show-commit-list: true
     wrappers:
       - ..base-wrappers:
       - workspace-cleanup:
@@ -35,9 +43,8 @@
           repo: itchio/itch
           branches: '$JENKINS_TAG'
     publishers:
-      - email:
-          recipients: amos@itchio
-          send-to-individuals: true
+      - slack:
+          build-server-url: https://ci.itch.ovh/
     builders:
       - shell: |
           echo > env.properties
