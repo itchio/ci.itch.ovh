@@ -47,6 +47,8 @@
       - shell: |
           node --version
           npm --version
+          sassc --version
+          go version
       - shell: |
           npm config set spin false
           npm install -g grunt-cli
