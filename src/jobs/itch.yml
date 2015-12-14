@@ -1,8 +1,21 @@
 
 - job:
     name: itch
-    .matrix-project:
-      combination-filter: '!(JENKINS_OS == "darwin" && JENKINS_ARCH == "386") && !(JENKINS_OS == "windows" && JENKINS_ARCH == "amd64")'
+    node: gcs
+    project-type: matrix
+    execution-strategy:
+      combination-filter: '!(JENKINS_XOS == "darwin" && JENKINS_ARCH == "386") && !(JENKINS_XOS == "true-windows" && JENKINS_ARCH == "amd64")'
+    axes:
+      - axis:
+         type: label-expression
+         name: JENKINS_XOS
+         values: ['true-windows', 'darwin', 'linux']
+      - axis:
+         type: user-defined
+         name: JENKINS_ARCH
+         values:
+           - 386
+           - amd64
     parameters:
       - ..base-parameters:
     wrappers:
@@ -10,12 +23,6 @@
       - workspace-cleanup:
           delete-dirs: true
       - credentials-binding:
-          - file:
-              credential-id: 33fed761-e912-43d1-bea8-54e579bfc0b8
-              variable: CODESIGN_SPC_PATH
-          - file:
-              credential-id: fcf86672-e97c-4896-a9d5-8e50c384c2ff
-              variable: CODESIGN_KEY_PATH
           - text:
               credential-id: 85395ee8-f0b4-4adc-8100-aee9509ab159
               variable: COVERALLS_REPO_TOKEN
@@ -28,6 +35,15 @@
           repo: itchio/itch
           branches: '$JENKINS_TAG'
     builders:
+      - shell: |
+          echo > env.properties
+          if [ "$JENKINS_XOS" = "true-windows" ]; then
+            echo "JENKINS_OS=windows" >> env.properties
+          else
+            echo "JENKINS_OS=$JENKINS_XOS" >> env.properties
+          fi
+      - inject:
+          properties-file: env.properties
       - shell: |
           node --version
           npm --version
@@ -66,7 +82,10 @@
           fi
 
           BUILD_PATH="build/$JENKINS_TAG/itch-$JENKINS_OS-$ELECTRON_ARCH"
-          TASKS="prepare electron:$JENKINS_OS-$ELECTRON_ARCH"
+
+          release/prepare.sh
+
+          TASKS="electron:$JENKINS_OS-$ELECTRON_ARCH"
 
           if [ "$JENKINS_OS" = "windows" ]; then
             TASKS="$TASKS create-windows-installer:$ELECTRON_ARCH"
