@@ -108,7 +108,7 @@
           grunt -v $TASKS
 
           if [ "$JENKINS_OS" = "windows" ]; then
-            UPLOADS="$UPLOADS $(echo build/squirrel-ia32/itch-${JENKINS_VERSION}*.nupkg build/*.exe build/RELEASES)"
+            UPLOADS="$UPLOADS $(echo build/squirrel-ia32/itch-${JENKINS_VERSION}*.nupkg build/squirrel-ia32/*.exe build/squirrel-ia32/RELEASES)"
           fi
 
           if [ "$JENKINS_OS" = "darwin" ]; then
@@ -129,6 +129,11 @@
 
           if [ "$JENKINS_OS" = "linux" ]; then
             DEB_VERSION=$JENKINS_VERSION
+            if [ "$JENKINS_ARCH" = "386" ]; then
+              DEB_ARCH="i686"
+            else
+              DEB_ARCH="x86_64"
+            fi
 
             rm -rf stage2 && mkdir -p stage2/itch
             cp -rf $BUILD_PATH/* stage2/itch
@@ -142,6 +147,7 @@
               --url "https://github.com/itchio/itch" \
               --version "$DEB_VERSION" \
               --maintainer "amos@itch.io" \
+              --architecture "$DEB_ARCH" \
               --license "MIT" \
               --vendor "itch.io" \
               --category "games" \
