@@ -158,6 +158,8 @@
               ../release/icons/icon72.png=/usr/share/icons/hicolor/72x72/apps/itch.png \
               ../release/icons/icon144.png=/usr/share/icons/hicolor/144x144/apps/itch.png \
               ../release/icons/icon512.png=/usr/share/icons/hicolor/512x512/apps/itch.png
+
+            UPLOADS="$UPLOADS $(echo *.deb)"
           fi
 
           # Let lord GitHub not be 502'ing, and I will upload one more time - the Devops bible
