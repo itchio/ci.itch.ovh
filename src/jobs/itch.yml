@@ -141,7 +141,6 @@
               -C stage2 \
               -s dir -t deb \
               --deb-compression xz \
-              --deb-activate update-desktop-database \
               -n itch \
               --description "The best way to play itch.io games" \
               --url "https://github.com/itchio/itch" \
