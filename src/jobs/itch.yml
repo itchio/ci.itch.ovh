@@ -137,6 +137,10 @@
 
             rm -rf stage2 && mkdir -p stage2/itch
             cp -rf $BUILD_PATH/* stage2/itch
+
+            gem uninstall fpm -x
+            gem install fpm-itchio
+
             fpm --force \
               -C stage2 \
               -s dir -t deb \
