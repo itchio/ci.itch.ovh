@@ -178,9 +178,8 @@
               github-release upload \
                       --tag "$JENKINS_TAG" \
                       --name "$(basename $f)" \
-                      --file "$f"
-              if [ "$?" = "0" ]; then
-                success="yay"
+                      --file "$f" && success="yay"
+              if [ "$success" = "yay" ]; then
                 break
               else
                 echo "Retrying upload of $f (try $i)"
