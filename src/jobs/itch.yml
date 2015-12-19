@@ -210,6 +210,7 @@
                 break
               else
                 echo "Retrying upload of $f (try $i)"
+                sleep 15
               fi
             done
 
