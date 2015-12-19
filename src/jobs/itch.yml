@@ -102,6 +102,8 @@
           TASKS="electron:$JENKINS_OS-$ELECTRON_ARCH"
 
           if [ "$JENKINS_OS" = "windows" ]; then
+            export JENKINS_WINDOWS_INSTALLER_PATH="/c/jenkins/workspace/itch-installers"
+            mkdir -p $JENKINS_WINDOWS_INSTALLER_PATH
             TASKS="$TASKS create-windows-installer:$ELECTRON_ARCH"
           fi
 
