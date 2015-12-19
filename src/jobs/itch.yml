@@ -215,6 +215,7 @@
 
             if [ "$success" != "yay" ]; then
               echo "Could not upload $f, despite our best efforts. Bailing out."
+              exit 1
             fi
           done
 
