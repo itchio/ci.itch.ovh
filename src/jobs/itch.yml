@@ -136,6 +136,14 @@
             else
               DEB_ARCH="x86_64"
             fi
+            DEB_NAME="itch"
+            DEB_DESCRIPTION="The best way to play itch.io games"
+            DEB_URL="https://github.com/itchio/itch"
+            DEB_MAINTAINER="Amos Wenger <amos@itch.io>"
+            DEB_LICENSE="MIT"
+            DEB_VENDOR="itch.io"
+            DEB_CATEGORY="games"
+            DEB_AFTER_INSTALL="$WORKSPACE/release/debian-after-install.sh"
 
             rm -rf stage2 && mkdir -p stage2/itch
             cp -rf $BUILD_PATH/* stage2/itch
@@ -143,22 +151,7 @@
             gem uninstall fpm -x
             gem install fpm-itchio
 
-            fpm --force \
-              -C stage2 \
-              -s dir -t deb \
-              --deb-compression xz \
-              -n itch \
-              --description "The best way to play itch.io games" \
-              --url "https://github.com/itchio/itch" \
-              --version "$DEB_VERSION" \
-              --maintainer "Amos Wenger <amos@itch.io>" \
-              --architecture "$DEB_ARCH" \
-              --license "MIT" \
-              --vendor "itch.io" \
-              --category "games" \
-              --after-install "$WORKSPACE/release/debian-after-install.sh" \
-              -d "p7zip-full (> 0)" \
-              itch=/opt \
+            DISTRO_FILES="itch=/opt \
               ../release/itch.sh=/usr/bin/itch \
               ../release/itch.desktop=/usr/share/applications/itch.desktop \
               ../release/icons/icon16.png=/usr/share/icons/hicolor/16x16/apps/itch.png \
@@ -168,9 +161,41 @@
               ../release/icons/icon64.png=/usr/share/icons/hicolor/64x64/apps/itch.png \
               ../release/icons/icon72.png=/usr/share/icons/hicolor/72x72/apps/itch.png \
               ../release/icons/icon144.png=/usr/share/icons/hicolor/144x144/apps/itch.png \
-              ../release/icons/icon512.png=/usr/share/icons/hicolor/512x512/apps/itch.png
+              ../release/icons/icon512.png=/usr/share/icons/hicolor/512x512/apps/itch.png"
 
-            UPLOADS="$UPLOADS $(echo *.deb)"
+            fpm --force \
+              -C stage2 -s dir -t deb \
+              --deb-compression xz \
+              --name "$DEB_NAME" \
+              --description "$DEB_DESCRIPTION" \
+              --url "$DEB_URL" \
+              --version "$DEB_VERSION" \
+              --maintainer "$DEB_MAINTAINER" \
+              --architecture "$DEB_ARCH" \
+              --license "$DEB_LICENSE" \
+              --vendor "$DEB_VENDOR" \
+              --category "$DEB_CATEGORY" \
+              --after-install "$DEB_AFTER_INSTALL" \
+              -d "p7zip-full (> 0)" \
+              $DISTRO_FILES
+
+            fpm --force \
+              -C stage2 -s dir -t rpm \
+              --rpm-compression xz \
+              --name "$DEB_NAME" \
+              --description "$DEB_DESCRIPTION" \
+              --url "$DEB_URL" \
+              --version "$DEB_VERSION" \
+              --maintainer "$DEB_MAINTAINER" \
+              --architecture "$DEB_ARCH" \
+              --license "$DEB_LICENSE" \
+              --vendor "$DEB_VENDOR" \
+              --category "$DEB_CATEGORY" \
+              --after-install "$DEB_AFTER_INSTALL" \
+              -d "p7zip" \
+              $DISTRO_FILES
+
+            UPLOADS="$UPLOADS $(echo *.deb *.rpm)"
           fi
 
           # Let lord GitHub not be 502'ing, and I will upload one more time - the Devops bible
