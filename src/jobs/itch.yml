@@ -110,7 +110,7 @@
           grunt -v $TASKS
 
           if [ "$JENKINS_OS" = "windows" ]; then
-            UPLOADS="$UPLOADS $(echo build/squirrel-ia32/itch-${JENKINS_VERSION}*.nupkg build/squirrel-ia32/*.exe build/squirrel-ia32/RELEASES)"
+            UPLOADS="$UPLOADS $(echo ${JENKINS_WINDOW_INSTALLER_PATH}/itch-${JENKINS_VERSION}*.nupkg ${JENKINS_WINDOW_INSTALLER_PATH}/*.exe ${JENKINS_WINDOW_INSTALLER_PATH}/RELEASES)"
           fi
 
           if [ "$JENKINS_OS" = "darwin" ]; then
