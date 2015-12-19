@@ -103,14 +103,14 @@
 
           if [ "$JENKINS_OS" = "windows" ]; then
             export JENKINS_WINDOWS_INSTALLER_PATH="/c/jenkins/workspace/itch-installers"
-            mkdir -p $JENKINS_WINDOWS_INSTALLER_PATH
+            mkdir -p ${JENKINS_WINDOWS_INSTALLER_PATH}
             TASKS="$TASKS create-windows-installer:$ELECTRON_ARCH"
           fi
 
           grunt -v $TASKS
 
           if [ "$JENKINS_OS" = "windows" ]; then
-            UPLOADS="$UPLOADS $(echo ${JENKINS_WINDOW_INSTALLER_PATH}/itch-${JENKINS_VERSION}*.nupkg ${JENKINS_WINDOW_INSTALLER_PATH}/*.exe ${JENKINS_WINDOW_INSTALLER_PATH}/RELEASES)"
+            UPLOADS="$UPLOADS $(echo ${JENKINS_WINDOWS_INSTALLER_PATH}/itch-${JENKINS_VERSION}*.nupkg ${JENKINS_WINDOWS_INSTALLER_PATH}/*.exe ${JENKINS_WINDOWS_INSTALLER_PATH}/RELEASES)"
           fi
 
           if [ "$JENKINS_OS" = "darwin" ]; then
