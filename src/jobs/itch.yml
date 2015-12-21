@@ -60,6 +60,8 @@
           npm --version
           sassc --version
           go version
+          ruby --version
+          gem --version
       - shell: |
           npm config set spin false
           npm install -g grunt-cli
@@ -82,9 +84,8 @@
           export GOPATH="$HOME/go"
           mkdir -p $GOPATH
           export PATH="$PATH:$GOPATH/bin"
-          go get github.com/aktau/github-release
-          export GITHUB_USER=itchio
-          export GITHUB_REPO=itch
+
+          gem install dpl
           export JENKINS_VERSION=$(echo $JENKINS_TAG | sed 's/^v//')
 
           UPLOADS=""
@@ -200,24 +201,12 @@
 
           # Let lord GitHub not be 502'ing, and I will upload one more time - the Devops bible
           for f in $(echo $UPLOADS); do
-            success=""
-            for i in 1 2 3 4 5; do
-              github-release upload \
-                      --tag "$JENKINS_TAG" \
-                      --name "$(basename $f)" \
-                      --file "$f" && success="yay"
-              if [ "$success" = "yay" ]; then
-                break
-              else
-                echo "Retrying upload of $f (try $i)"
-                sleep 15
-              fi
-            done
-
-            if [ "$success" != "yay" ]; then
-              echo "Could not upload $f, despite our best efforts. Bailing out."
-              exit 1
-            fi
+            set +x
+            dpl --provider=releases \
+              --api-key="$GITHUB_TOKEN" \
+              --repo="itchio/cigale" \
+              --file "$f"
+            set -x
           done
 
 - .commit-trigger:
