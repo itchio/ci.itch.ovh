@@ -131,20 +131,21 @@
           fi
 
           if [ "$JENKINS_OS" = "linux" ]; then
-            DEB_VERSION=$JENKINS_VERSION
+            JENKINS_RELEASE_DATE="$(date +%Y-%m-%d)"
+            FPM_VERSION=$JENKINS_VERSION
             if [ "$JENKINS_ARCH" = "386" ]; then
-              DEB_ARCH="i686"
+              FPM_ARCH="i686"
             else
-              DEB_ARCH="x86_64"
+              FPM_ARCH="x86_64"
             fi
-            DEB_NAME="itch"
-            DEB_DESCRIPTION="The best way to play itch.io games"
-            DEB_URL="https://github.com/itchio/itch"
-            DEB_MAINTAINER="Amos Wenger <amos@itch.io>"
-            DEB_LICENSE="MIT"
-            DEB_VENDOR="itch.io"
-            DEB_CATEGORY="games"
-            DEB_AFTER_INSTALL="$WORKSPACE/release/debian-after-install.sh"
+            FPM_NAME="itch"
+            FPM_DESCRIPTION="The best way to play itch.io games"
+            FPM_URL="https://github.com/itchio/itch"
+            FPM_MAINTAINER="Amos Wenger <amos@itch.io>"
+            FPM_LICENSE="MIT"
+            FPM_VENDOR="itch.io"
+            FPM_CATEGORY="games"
+            FPM_AFTER_INSTALL="$WORKSPACE/release/debian-after-install.sh"
 
             rm -rf stage2 && mkdir -p stage2/itch
             cp -rf $BUILD_PATH/* stage2/itch
@@ -167,36 +168,61 @@
             fpm --force \
               -C stage2 -s dir -t deb \
               --deb-compression xz \
-              --name "$DEB_NAME" \
-              --description "$DEB_DESCRIPTION" \
-              --url "$DEB_URL" \
-              --version "$DEB_VERSION" \
-              --maintainer "$DEB_MAINTAINER" \
-              --architecture "$DEB_ARCH" \
-              --license "$DEB_LICENSE" \
-              --vendor "$DEB_VENDOR" \
-              --category "$DEB_CATEGORY" \
-              --after-install "$DEB_AFTER_INSTALL" \
+              --name "$FPM_NAME" \
+              --description "$FPM_DESCRIPTION" \
+              --url "$FPM_URL" \
+              --version "$FPM_VERSION" \
+              --maintainer "$FPM_MAINTAINER" \
+              --architecture "$FPM_ARCH" \
+              --license "$FPM_LICENSE" \
+              --vendor "$FPM_VENDOR" \
+              --category "$FPM_CATEGORY" \
+              --after-install "$FPM_AFTER_INSTALL" \
               -d "p7zip-full (> 0)" \
               $DISTRO_FILES
 
             fpm --force \
               -C stage2 -s dir -t rpm \
               --rpm-compression xz \
-              --name "$DEB_NAME" \
-              --description "$DEB_DESCRIPTION" \
-              --url "$DEB_URL" \
-              --version "$DEB_VERSION" \
-              --maintainer "$DEB_MAINTAINER" \
-              --architecture "$DEB_ARCH" \
-              --license "$DEB_LICENSE" \
-              --vendor "$DEB_VENDOR" \
-              --category "$DEB_CATEGORY" \
-              --after-install "$DEB_AFTER_INSTALL" \
+              --name "$FPM_NAME" \
+              --description "$FPM_DESCRIPTION" \
+              --url "$FPM_URL" \
+              --version "$FPM_VERSION" \
+              --maintainer "$FPM_MAINTAINER" \
+              --architecture "$FPM_ARCH" \
+              --license "$FPM_LICENSE" \
+              --vendor "$FPM_VENDOR" \
+              --category "$FPM_CATEGORY" \
+              --after-install "$FPM_AFTER_INSTALL" \
               -d "p7zip" \
               $DISTRO_FILES
 
             UPLOADS="$UPLOADS $(echo *.deb *.rpm)"
+
+            if [ "$JENKINS_ARCH" = "386" ]; then
+              DEB_ARCH="i386"
+            else
+              DEB_ARCH="amd64"
+            fi
+
+            cp -rfv *.deb *.rpm build/
+
+            for repo in rpm deb; do
+              rm -f bintray.json
+              sed \
+                -e "s/{{JENKINS_VERSION}}/${JENKINS_VERSION}/g" \
+                -e "s/{{JENKINS_RELEASE_DATE}}/${JENKINS_RELEASE_DATE}/g" \
+                -e "s/{{DEB_ARCH}}/${DEB_ARCH}/" \
+                < release/bintray.${repo}.json \
+                > bintray.json
+              cat bintray.json
+              set +x
+              dpl --provider=bintray \
+                --file=bintray.json \
+                --user=fasterthanlime \
+                --key="$BINTRAY_TOKEN" \
+              set -x
+            done
           fi
 
           # Let lord GitHub not be 502'ing, and I will upload one more time - the Devops bible
@@ -221,6 +247,9 @@
           - text:
               credential-id: 06e1f5e8-9ccc-4d33-9dcf-450565d79781
               variable: GITHUB_TOKEN
+          - text:
+              credential-id: 6af397da-f8a8-4e21-89c3-cef4616fb0bd
+              variable: BINTRAY_TOKEN
     post-builders:
       - inject:
           properties-file: version.prop
