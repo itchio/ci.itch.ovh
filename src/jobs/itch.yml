@@ -220,7 +220,7 @@
               dpl --provider=bintray \
                 --file=bintray.json \
                 --user=fasterthanlime \
-                --key="$BINTRAY_TOKEN" \
+                --key="$BINTRAY_TOKEN"
               set -x
             done
           fi
