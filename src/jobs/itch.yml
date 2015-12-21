@@ -37,6 +37,9 @@
           - text:
               credential-id: 06e1f5e8-9ccc-4d33-9dcf-450565d79781
               variable: GITHUB_TOKEN
+          - text:
+              credential-id: 6af397da-f8a8-4e21-89c3-cef4616fb0bd
+              variable: BINTRAY_TOKEN
     scm:
       - .git: &itch-git
           host: github.com
@@ -247,9 +250,6 @@
           - text:
               credential-id: 06e1f5e8-9ccc-4d33-9dcf-450565d79781
               variable: GITHUB_TOKEN
-          - text:
-              credential-id: 6af397da-f8a8-4e21-89c3-cef4616fb0bd
-              variable: BINTRAY_TOKEN
     post-builders:
       - inject:
           properties-file: version.prop
