@@ -200,7 +200,9 @@
               -d "p7zip" \
               $DISTRO_FILES
 
-            UPLOADS="$UPLOADS $(echo *.deb *.rpm)"
+            mv *.deb *.rpm build/
+
+            UPLOADS="$UPLOADS $(echo build/*.deb build/*.rpm)"
 
             if [ "$JENKINS_ARCH" = "386" ]; then
               DEB_ARCH="i386"
@@ -208,9 +210,8 @@
               DEB_ARCH="amd64"
             fi
 
-            cp -rfv *.deb *.rpm build/
-
             for repo in rpm deb; do
+              echo "Uploading to $repo repo"
               rm -f bintray.json
               sed \
                 -e "s/{{JENKINS_VERSION}}/${JENKINS_VERSION}/g" \
@@ -230,6 +231,7 @@
 
           # Let lord GitHub not be 502'ing, and I will upload one more time - the Devops bible
           for f in $(echo $UPLOADS); do
+            echo "Uploading $f"
             set +x
             dpl --provider=releases \
               --api-key="$GITHUB_TOKEN" \
