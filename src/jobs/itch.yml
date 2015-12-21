@@ -236,6 +236,7 @@
             dpl --provider=releases \
               --api-key="$GITHUB_TOKEN" \
               --repo="itchio/cigale" \
+              --release-number="${JENKINS_TAG}" \
               --file="$f"
             set -x
           done
