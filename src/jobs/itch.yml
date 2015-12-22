@@ -63,8 +63,10 @@
           npm --version
           sassc --version
           go version
-          ruby --version
-          gem --version
+          if [ "$JENKINS_OS" = "linux" ]; then
+            ruby --version
+            gem --version
+          fi
       - shell: |
           npm config set spin false
           npm install -g grunt-cli
@@ -87,8 +89,10 @@
           export GOPATH="$HOME/go"
           mkdir -p $GOPATH
           export PATH="$PATH:$GOPATH/bin"
+          go get github.com/itchio/github-release
+          export GITHUB_USER=itchio
+          export GITHUB_REPO=itch
 
-          gem install dpl
           export JENKINS_VERSION=$(echo $JENKINS_TAG | sed 's/^v//')
 
           UPLOADS=""
@@ -134,6 +138,8 @@
           fi
 
           if [ "$JENKINS_OS" = "linux" ]; then
+            gem install dpl
+
             JENKINS_RELEASE_DATE="$(date +%Y-%m-%d)"
             FPM_VERSION=$JENKINS_VERSION
             if [ "$JENKINS_ARCH" = "386" ]; then
@@ -231,14 +237,26 @@
 
           # Let lord GitHub not be 502'ing, and I will upload one more time - the Devops bible
           for f in $(echo $UPLOADS); do
-            echo "Uploading $f"
-            set +x
-            dpl --provider=releases \
-              --api-key="$GITHUB_TOKEN" \
-              --repo="itchio/cigale" \
-              --release-number="${JENKINS_TAG}" \
-              --file="$f"
-            set -x
+            success=""
+            for i in 1 2 3 4 5; do
+              github-release upload \
+                      --tag "$JENKINS_TAG" \
+                      --name "$(basename $f)" \
+                      --file "$f" \
+                      --replace \
+                      && success="yay"
+              if [ "$success" = "yay" ]; then
+                break
+              else
+                echo "Retrying upload of $f (try $i)"
+                sleep 30
+              fi
+            done
+
+            if [ "$success" != "yay" ]; then
+              echo "Could not upload $f, despite our best efforts. Bailing out."
+              exit 1
+            fi
           done
 
 - .commit-trigger:
