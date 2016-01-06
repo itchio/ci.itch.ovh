@@ -162,6 +162,9 @@
             gem uninstall fpm -x
             gem install fpm-itchio
 
+            release/generate-itch-desktop.sh
+            cat release/itch.desktop
+
             DISTRO_FILES="itch=/opt \
               ../release/itch.sh=/usr/bin/itch \
               ../release/itch.desktop=/usr/share/applications/itch.desktop \
