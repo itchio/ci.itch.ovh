@@ -283,7 +283,7 @@
           export GOPATH="$HOME/go"
           mkdir -p $GOPATH
           export PATH="$PATH:$GOPATH/bin"
-          go get github.com/aktau/github-release
+          go get github.com/itchio/github-release
           export GITHUB_USER=itchio
           export GITHUB_REPO=itch
 
