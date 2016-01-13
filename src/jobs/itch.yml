@@ -191,6 +191,7 @@
               --category "$FPM_CATEGORY" \
               --after-install "$FPM_AFTER_INSTALL" \
               -d "p7zip-full (> 0)" \
+              -d "desktop-file-utils (> 0)" \
               $DISTRO_FILES
 
             fpm --force \
@@ -207,6 +208,7 @@
               --category "$FPM_CATEGORY" \
               --after-install "$FPM_AFTER_INSTALL" \
               -d "p7zip" \
+              -d "desktop-file-utils" \
               $DISTRO_FILES
 
             mv *.deb *.rpm build/
