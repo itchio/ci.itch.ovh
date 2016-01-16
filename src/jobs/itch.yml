@@ -84,8 +84,6 @@
             exit 0
           fi
 
-          npm install -g babel-cli@6
-
           export GOPATH="$HOME/go"
           mkdir -p $GOPATH
           export PATH="$PATH:$GOPATH/bin"
