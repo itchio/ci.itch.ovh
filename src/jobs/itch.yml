@@ -46,6 +46,7 @@
           repo: itchio/itch
           branches: '$JENKINS_TAG'
     publishers:
+      - github-notifier
       - slack:
           build-server-url: https://ci.itch.ovh/
     builders:
