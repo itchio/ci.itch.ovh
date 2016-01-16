@@ -38,6 +38,8 @@
             condition: success
 
 - :commit-trigger:
+    :defaults:
+      post-publishers: []
     job:
       name: '{project} ← on commit'
       node: gcs
@@ -60,3 +62,4 @@
           - project: '{project}'
             property-file: version.prop
             condition: success
+        - ..identity: '{post-publishers}'
