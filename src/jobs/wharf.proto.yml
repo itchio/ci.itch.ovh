@@ -1,12 +1,12 @@
 
 - job:
-    name: rsync-go
+    name: wharf.proto
     triggers:
       - github
     scm:
       .git-go:
         host: github.com
-        repo: itchio/rsync-go
+        repo: itchio/wharf.proto
         branches: '**'
     wrappers:
       - ..base-wrappers:
@@ -16,7 +16,7 @@
       - shell: |
           export GOPATH="$WORKSPACE"
 
-          JENKINS_IMPORT_PATH=github.com/itchio/rsync-go
+          JENKINS_IMPORT_PATH=github.com/itchio/wharf.proto
 
           go get -d -v $JENKINS_IMPORT_PATH/...
-          go test -v $JENKINS_IMPORT_PATH
+          go test -v $JENKINS_IMPORT_PATH/...
