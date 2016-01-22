@@ -72,6 +72,7 @@
           npm install -g grunt-cli
           export PATH=$PATH:$PWD/node_modules/.bin
           npm install
+          npm run lint
           npm test
       - shell: |
           if [ "$JENKINS_OS-$JENKINS_ARCH" = "linux-amd64" ]; then
