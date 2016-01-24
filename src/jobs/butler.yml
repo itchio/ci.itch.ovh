@@ -12,7 +12,7 @@
           values:
             - windows
             - darwin
-            - geezer
+            - wheezy
       - axis:
           type: user-defined
           name: JENKINS_ARCH
@@ -33,7 +33,7 @@
     builders:
       - shell: |
           echo > env.properties
-          if [ "$JENKINS_XOS" = "geezer" ]; then
+          if [ "$JENKINS_XOS" = "wheezy" ]; then
             echo "JENKINS_OS=linux" >> env.properties
           else
             echo "JENKINS_OS=$JENKINS_XOS" >> env.properties
