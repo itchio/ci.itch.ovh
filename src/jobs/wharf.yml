@@ -1,20 +1,13 @@
 
 - job:
     name: wharf
-    node: gcs
+    triggers:
+      - github
     scm:
-      .git-go: &wharf-git
-        host: bitbucket.org
+      .git-go:
+        host: github.com
         repo: itchio/wharf
-        branches: '$JENKINS_TAG'
-    parameters:
-      - ..base-parameters:
-      - string:
-          name: JENKINS_OS
-          default: 'linux'
-      - string:
-          name: JENKINS_ARCH
-          default: 'amd64'
+        branches: '**'
     wrappers:
       - ..base-wrappers:
       - workspace-cleanup:
@@ -22,21 +15,8 @@
     builders:
       - shell: |
           export GOPATH="$WORKSPACE"
-          JENKINS_IMPORT_PATH=bitbucket.org/itchio/wharf
 
-          go get -d -v $JENKINS_IMPORT_PATH/...
-          go build -v $JENKINS_IMPORT_PATH
-          file wharf
+          JENKINS_IMPORT_PATH=github.com/itchio/wharf
 
-          if [ "$JENKINS_DEPLOY" = "1" ]; then
-            7za a wharf.7z wharf
-            echo $JENKINS_TAG > LATEST
-          fi
-    publishers:
-      - .deploy-to-gcs:
-          package: wharf
-          public: false
-
-- ..standard-triggers:
-    project: wharf
-    git: *wharf-git
+          go get -d -v -t $JENKINS_IMPORT_PATH/...
+          go test -v $JENKINS_IMPORT_PATH/...
