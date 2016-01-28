@@ -74,6 +74,7 @@
 
           JENKINS_IMPORT_PATH=github.com/itchio/butler
           GOOS="$JENKINS_OS" GOARCH="$JENKINS_ARCH" go get -v -d $JENKINS_IMPORT_PATH/...
+          go test -v $JENKINS_IMPORT_PATH/...
           gox -osarch "$JENKINS_OS/$JENKINS_ARCH" -ldflags "$JENKINS_LDFLAGS" -cgo -output="butler" $JENKINS_IMPORT_PATH
 
           file $TARGET
