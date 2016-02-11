@@ -1,0 +1,23 @@
+
+- job:
+    name: itchio-go
+    triggers:
+      - github
+    scm:
+      .git-go:
+        host: github.com
+        repo: itchio/itchio-go
+        branches: '**'
+    wrappers:
+      - ..base-wrappers:
+      - workspace-cleanup:
+          delete-dirs: true
+    builders:
+      - shell: |
+          export GOPATH="$WORKSPACE"
+
+          JENKINS_IMPORT_PATH=github.com/itchio/itchio-go
+
+          go get -d -v -t $JENKINS_IMPORT_PATH/...
+          go test -v $JENKINS_IMPORT_PATH/...
+
