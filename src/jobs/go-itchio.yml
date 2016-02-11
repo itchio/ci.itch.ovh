@@ -1,12 +1,12 @@
 
 - job:
-    name: itchio-go
+    name: go-itchio
     triggers:
       - github
     scm:
       .git-go:
         host: github.com
-        repo: itchio/itchio-go
+        repo: itchio/go-itchio
         branches: '**'
     wrappers:
       - ..base-wrappers:
@@ -16,7 +16,7 @@
       - shell: |
           export GOPATH="$WORKSPACE"
 
-          JENKINS_IMPORT_PATH=github.com/itchio/itchio-go
+          JENKINS_IMPORT_PATH=github.com/itchio/go-itchio
 
           go get -d -v -t $JENKINS_IMPORT_PATH/...
           go test -v $JENKINS_IMPORT_PATH/...
